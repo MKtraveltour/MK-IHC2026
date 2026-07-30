@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kyoto MK | Airport Transfer & Sightseeing Reservation 空港送迎・観光ハイヤー予約</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1C2541;
+    --ink-soft:#3A4266;
+    --gold:#B8935B;
+    --gold-soft:#D8BE93;
+    --lacquer:#9C3B3B;
+    --paper:#F6F3EB;
+    --card:#FFFFFF;
+    --mist:#E4DFD1;
+    --text:#26241F;
+    --text-mute:#6B6656;
+    --radius:2px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(28,37,65,0.05) 1px, transparent 0);
+    background-size: 22px 22px;
+    color:var(--text);
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    line-height:1.6;
+  }
+  h1,h2,h3,.serif{font-family:'Shippori Mincho', serif;}
+
+  /* ---------- Header ---------- */
+  .masthead{
+    background:var(--ink);
+    color:#EFE9DA;
+    padding:56px 24px 72px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .masthead::after{
+    content:"";
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:3px;
+    background:linear-gradient(90deg,transparent,var(--gold) 20%,var(--gold) 80%,transparent);
+  }
+  .masthead .eyebrow{
+    letter-spacing:.32em;
+    text-transform:uppercase;
+    font-size:11px;
+    color:var(--gold-soft);
+    margin-bottom:18px;
+  }
+  .masthead h1{
+    font-size:clamp(28px,4vw,44px);
+    font-weight:600;
+    margin:0 0 10px;
+    letter-spacing:.02em;
+  }
+  .masthead .jp-title{
+    font-size:clamp(16px,2vw,20px);
+    color:#C9C2AC;
+    font-weight:500;
+    letter-spacing:.08em;
+  }
+
+  /* ---------- Layout ---------- */
+  .wrap{
+    max-width:1180px;
+    margin:-40px auto 0;
+    padding:0 24px 80px;
+    display:grid;
+    grid-template-columns:230px 1fr;
+    gap:48px;
+    align-items:start;
+    position:relative;
+    z-index:1;
+  }
+  @media (max-width:880px){
+    .wrap{grid-template-columns:1fr; margin-top:-20px;}
+  }
+
+  /* ---------- Journey rail (signature element) ---------- */
+  .rail{
+    position:sticky;
+    top:32px;
+    background:var(--card);
+    border:1px solid var(--mist);
+    padding:28px 20px;
+    border-radius:var(--radius);
+  }
+  @media (max-width:880px){
+    .rail{position:static; display:flex; overflow-x:auto; gap:0; padding:16px;}
+  }
+  .rail-title{
+    font-size:11px;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    color:var(--text-mute);
+    margin-bottom:22px;
+  }
+  @media (max-width:880px){ .rail-title{display:none;} }
+  .stop{
+    display:flex;
+    gap:14px;
+    position:relative;
+    padding-bottom:34px;
+    cursor:pointer;
+  }
+  @media (max-width:880px){
+    .stop{flex-direction:column; align-items:center; padding-bottom:0; padding-right:28px; text-align:center; min-width:76px;}
+  }
+  .stop:last-child{padding-bottom:0;}
+  .stop::before{
+    content:"";
+    position:absolute;
+    left:15px; top:34px; bottom:0;
+    width:1px;
+    background:var(--mist);
+  }
+  @media (max-width:880px){
+    .stop::before{left:34px; top:15px; bottom:auto; right:-28px; width:auto; height:1px;}
+  }
+  .stop:last-child::before{display:none;}
+  .stop-icon{
+    flex:none;
+    width:32px; height:32px;
+    border-radius:50%;
+    border:1.5px solid var(--mist);
+    background:var(--card);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--text-mute);
+    transition:border-color .3s, color .3s, background .3s;
+    z-index:1;
+  }
+  .stop-icon svg{width:15px;height:15px;}
+  .stop-label .en{font-size:13px; font-weight:700; color:var(--text);}
+  .stop-label .jp{font-size:11px; color:var(--text-mute); font-family:'Shippori Mincho',serif;}
+  .stop.active .stop-icon{border-color:var(--lacquer); color:var(--lacquer); background:#FBF1EF;}
+  .stop.active .en{color:var(--lacquer);}
+  .stop.done .stop-icon{border-color:var(--gold); color:var(--gold); background:#FFFCF6;}
+
+  /* ---------- Form sections ---------- */
+  .intro-card{
+    background:var(--card);
+    border:1px solid var(--mist);
+    border-left:3px solid var(--gold);
+    padding:22px 26px;
+    margin-bottom:36px;
+    font-size:14px;
+    color:var(--text-mute);
+  }
+  section.stage{
+    background:var(--card);
+    border:1px solid var(--mist);
+    margin-bottom:28px;
+    scroll-margin-top:24px;
+  }
+  .stage-head{
+    padding:22px 28px;
+    border-bottom:1px solid var(--mist);
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+    background:linear-gradient(180deg,#FBFAF6,var(--card));
+  }
+  .stage-head .num{
+    font-family:'Shippori Mincho',serif;
+    color:var(--gold);
+    font-size:13px;
+    letter-spacing:.1em;
+  }
+  .stage-head h2{
+    font-size:20px;
+    margin:0;
+    font-weight:600;
+    color:var(--ink);
+  }
+  .stage-head .jp{
+    font-size:13px;
+    color:var(--text-mute);
+    font-family:'Shippori Mincho',serif;
+  }
+  .stage-body{padding:28px;}
+
+  .field{margin-bottom:24px;}
+  .field:last-child{margin-bottom:0;}
+  .field label.flabel{
+    display:block;
+    font-size:14px;
+    font-weight:700;
+    margin-bottom:4px;
+    color:var(--ink);
+  }
+  .field label.flabel .jp{
+    display:block;
+    font-weight:500;
+    font-size:12.5px;
+    color:var(--text-mute);
+    font-family:'Shippori Mincho',serif;
+    margin-top:1px;
+  }
+  .req{color:var(--lacquer); margin-left:4px; font-weight:700;}
+  .note{font-size:12.5px; color:var(--text-mute); margin-top:6px;}
+
+  input[type=text], input[type=email], input[type=tel], input[type=number], select, textarea{
+    width:100%;
+    font:inherit;
+    padding:11px 13px;
+    border:1px solid #CFC8B4;
+    border-radius:var(--radius);
+    background:#FEFDFB;
+    color:var(--text);
+  }
+  input:focus-visible, select:focus-visible, textarea:focus-visible, .choice input:focus-visible + span{
+    outline:2px solid var(--lacquer);
+    outline-offset:2px;
+  }
+  textarea{min-height:96px; resize:vertical;}
+
+  .row{display:grid; gap:16px;}
+  .row.cols-2{grid-template-columns:1fr 1fr;}
+  .row.cols-3{grid-template-columns:1fr 1fr 1fr;}
+  @media (max-width:640px){ .row.cols-2, .row.cols-3{grid-template-columns:1fr;} }
+
+  .choices{display:flex; flex-wrap:wrap; gap:10px;}
+  .choices.vertical{flex-direction:column;}
+  .choice{
+    position:relative;
+  }
+  .choice input{position:absolute; opacity:0; width:0; height:0;}
+  .choice span{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 16px;
+    border:1px solid #CFC8B4;
+    border-radius:var(--radius);
+    font-size:14px;
+    cursor:pointer;
+    background:#FEFDFB;
+    transition:border-color .2s, background .2s, color .2s;
+  }
+  .choice input:checked + span{
+    border-color:var(--lacquer);
+    background:#FBF1EF;
+    color:var(--lacquer);
+    font-weight:700;
+  }
+  .choices.vertical .choice span{width:100%;}
+
+  .phone-group{display:grid; grid-template-columns:130px 1fr; gap:10px;}
+  .time-group{display:grid; grid-template-columns:90px auto 90px; gap:8px; align-items:center; max-width:260px;}
+  .time-group span{color:var(--text-mute);}
+
+  .divider-label{
+    font-size:11px; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--gold); margin:6px 0 14px; padding-top:14px; border-top:1px dashed var(--mist);
+  }
+  .divider-label:first-child{border-top:none; padding-top:0; margin-top:0;}
+
+  .remarks-box{
+    background:#FBF6EC;
+    border:1px solid var(--gold-soft);
+    padding:20px 22px;
+    font-size:13.5px;
+    color:var(--text-mute);
+  }
+  .remarks-box h3{margin:0 0 10px; font-size:15px; color:var(--lacquer);}
+  .remarks-box ul{margin:0; padding-left:18px;}
+  .remarks-box li{margin-bottom:6px;}
+  .remarks-box strong{color:var(--ink);}
+
+  .fare-card{
+    margin-top:16px;
+    background:#FBF8F0;
+    border:1px solid var(--gold-soft);
+    padding:20px 22px;
+  }
+  .fare-card .row-line{
+    display:flex;
+    justify-content:space-between;
+    font-size:14px;
+    padding:6px 0;
+    color:var(--text-mute);
+  }
+  .fare-card .row-line.total{
+    border-top:1px solid var(--gold-soft);
+    margin-top:6px;
+    padding-top:12px;
+    font-size:17px;
+    font-weight:700;
+    color:var(--ink);
+  }
+  .fare-card .fare-note{
+    font-size:12px;
+    color:var(--text-mute);
+    margin-top:10px;
+  }
+
+  .submit-bar{
+    display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap;
+    padding:26px 28px;
+  }
+  .submit-bar .hint{font-size:12.5px; color:var(--text-mute); max-width:340px;}
+  button.cta{
+    font-family:'Shippori Mincho',serif;
+    background:var(--ink);
+    color:#F4EFE2;
+    border:1px solid var(--ink);
+    padding:16px 40px;
+    font-size:16px;
+    letter-spacing:.06em;
+    cursor:pointer;
+    transition:background .25s, transform .15s;
+  }
+  button.cta:hover{background:var(--lacquer); border-color:var(--lacquer);}
+  button.cta:active{transform:translateY(1px);}
+
+  .confirm-panel{
+    display:none;
+    background:var(--card);
+    border:1px solid var(--gold);
+    padding:40px 32px;
+    text-align:center;
+  }
+  .confirm-panel.show{display:block;}
+  .confirm-panel .seal{
+    width:56px; height:56px; margin:0 auto 18px;
+    border:2px solid var(--lacquer); border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--lacquer);
+  }
+  .confirm-panel h2{margin:0 0 8px; color:var(--ink);}
+  .confirm-panel p{color:var(--text-mute); font-size:14px; max-width:460px; margin:6px auto;}
+
+  footer{
+    text-align:center;
+    font-size:12px;
+    color:var(--text-mute);
+    padding:30px 20px 50px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="eyebrow">Kyoto MK · Chauffeur Service</div>
+  <h1>Airport Transfer &amp; Sightseeing Reservation</h1>
+  <div class="jp-title">空港送迎・観光ハイヤー ご予約フォーム</div>
+</header>
+
+<div class="wrap">
+
+  <!-- Journey rail -->
+  <nav class="rail" aria-label="Booking sections">
+    <div class="rail-title">Your Journey</div>
+    <div class="stop active" data-target="#stage-guest">
+      <div class="stop-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2 4 6v4c0 6 3.6 9.6 8 12 4.4-2.4 8-6 8-12V6l-8-4Z"/></svg>
+      </div>
+      <div class="stop-label"><div class="en">Guest Details</div><div class="jp">お客様情報</div></div>
+    </div>
+    <div class="stop" data-target="#stage-pickup">
+      <div class="stop-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-6.5-5.6-6.5-11A6.5 6.5 0 0 1 12 3.5 6.5 6.5 0 0 1 18.5 10c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.2"/></svg>
+      </div>
+      <div class="stop-label"><div class="en">Pick-up</div><div class="jp">お迎え</div></div>
+    </div>
+    <div class="stop" data-target="#stage-vehicle">
+      <div class="stop-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 13l1.6-4.8A2 2 0 0 1 6.5 7h11a2 2 0 0 1 1.9 1.2L21 13v5a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1H6v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-5Z"/><circle cx="7.5" cy="17.5" r="1.2"/><circle cx="16.5" cy="17.5" r="1.2"/></svg>
+      </div>
+      <div class="stop-label"><div class="en">Vehicle</div><div class="jp">お車</div></div>
+    </div>
+    <div class="stop" data-target="#stage-dropoff">
+      <div class="stop-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 21h14M12 21V7M7 7l5-4 5 4"/></svg>
+      </div>
+      <div class="stop-label"><div class="en">Drop-off</div><div class="jp">ご降車</div></div>
+    </div>
+    <div class="stop" data-target="#stage-confirm">
+      <div class="stop-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 13l4 4L19 7"/></svg>
+      </div>
+      <div class="stop-label"><div class="en">Confirm</div><div class="jp">ご確認</div></div>
+    </div>
+  </nav>
+
+  <!-- Form -->
+  <main>
+    <div class="intro-card">
+      <p style="margin:0 0 8px;"><strong>Reservation is not complete until confirmed by MK.</strong></p>
+      <p style="margin:0;">ご予約はMKからの確認メールをもって成立となります。折り返しのご連絡まで2日程度お時間をいただく場合がございます。</p>
+    </div>
+
+    <div class="intro-card" id="tripSummaryCard" style="display:none; border-left-color:var(--lacquer);"></div>
+
+    <form id="reservationForm" novalidate>
+
+      <!-- STAGE 1 -->
+      <section class="stage" id="stage-guest">
+        <div class="stage-head">
+          <span class="num">01</span>
+          <h2>Guest Details</h2>
+          <span class="jp">お客様情報</span>
+        </div>
+        <div class="stage-body">
+
+          <div class="field">
+            <label class="flabel">Type of Reservation<span class="req">*</span><span class="jp">予約種別</span></label>
+            <div class="choices">
+              <label class="choice"><input type="radio" name="f03" value="1" required><span>Transfer</span></label>
+              <label class="choice"><input type="radio" name="f03" value="2"><span>Sightseeing</span></label>
+              <label class="choice"><input type="radio" name="f03" value="3"><span>Transfer + Sightseeing</span></label>
+            </div>
+          </div>
+
+          <div class="row cols-2">
+            <div class="field">
+              <label class="flabel" for="f06">Full Name<span class="req">*</span><span class="jp">お名前</span></label>
+              <input type="text" id="f06" name="f06" required>
+            </div>
+            <div class="field">
+              <label class="flabel">Gender<span class="req">*</span><span class="jp">性別</span></label>
+              <div class="choices">
+                <label class="choice"><input type="radio" name="f07" value="1" required><span>Male</span></label>
+                <label class="choice"><input type="radio" name="f07" value="2"><span>Female</span></label>
+                <label class="choice"><input type="radio" name="f07" value="3"><span>N/A</span></label>
+              </div>
+            </div>
+          </div>
+
+          <div class="row cols-2">
+            <div class="field">
+              <label class="flabel" for="f08">Email Address<span class="req">*</span><span class="jp">メールアドレス</span></label>
+              <input type="email" id="f08" name="f08" placeholder="myemail@address.com" required>
+              <div class="note">We cannot send emails to @sbcglobal.net addresses.</div>
+            </div>
+            <div class="field">
+              <label class="flabel">Phone Number<span class="req">*</span><span class="jp">電話番号</span></label>
+              <div class="phone-group">
+                <select name="f09:countryCode" required>
+                  <option value="" selected>Country</option>
+                  <option value="JP">JP (+81)</option>
+                  <option value="US">US (+1)</option>
+                  <option value="GB">GB (+44)</option>
+                  <option value="AU">AU (+61)</option>
+                  <option value="CN">CN (+86)</option>
+                  <option value="KR">KR (+82)</option>
+                  <option value="FR">FR (+33)</option>
+                  <option value="DE">DE (+49)</option>
+                  <option value="OTHER">Other</option>
+                </select>
+                <input type="tel" name="f09" placeholder="702 123 4567" required>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- STAGE 2 -->
+      <section class="stage" id="stage-pickup">
+        <div class="stage-head">
+          <span class="num">02</span>
+          <h2>Pick-up</h2>
+          <span class="jp">お迎え</span>
+        </div>
+        <div class="stage-body">
+
+          <div class="row cols-2">
+            <div class="field">
+              <label class="flabel" for="f043">Date of Travel<span class="req">*</span><span class="jp">利用日</span></label>
+              <input type="text" id="f043" name="f043" placeholder="Month/Day/Year" required>
+              <div class="note">Please only book for 3 days after your application date.<br>申込日より3日以降でご予約ください。</div>
+            </div>
+            <div class="field">
+              <label class="flabel" for="f011">Number of Customers<span class="req">*</span><span class="jp">ご利用人数</span></label>
+              <input type="number" id="f011" name="f011" min="1" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="flabel">Pick-up Location<span class="req">*</span><span class="jp">出発地</span></label>
+            <div class="choices vertical">
+              <label class="choice"><input type="radio" name="f023" value="1" required><span>JR Kyoto Station — MK VIP Station</span></label>
+              <label class="choice"><input type="radio" name="f023" value="2"><span>Kyoto Station Platform</span></label>
+              <label class="choice"><input type="radio" name="f023" value="3"><span>Kansai International Airport</span></label>
+              <label class="choice"><input type="radio" name="f023" value="4"><span>Itami Airport</span></label>
+              <label class="choice"><input type="radio" name="f023" value="5"><span>Hotel</span></label>
+              <label class="choice"><input type="radio" name="f023" value="6"><span>Other</span></label>
+            </div>
+            <div class="note">Pick-up at Kyoto Station platform requires a driver entrance fee of ¥1,500 (entrance + parking). <a href="https://www.mk-group.co.jp/mktravel/pdf/en_kyotostation-mkvip-map.pdf" target="_blank" rel="noopener">MK VIP station map ↗</a></div>
+          </div>
+
+          <div class="row cols-2">
+            <div class="field">
+              <label class="flabel" for="place1_detail">Pick-up Location Detail<span class="req">*</span><span class="jp">出発地の詳細</span></label>
+              <input type="text" id="place1_detail" name="place1_detail" placeholder="e.g. ○○ Hotel" required>
+              <div class="note">Train no./seat, flight no., hotel name, etc.</div>
+            </div>
+            <div class="field">
+              <label class="flabel">Pick-up Time<span class="req">*</span><span class="jp">出発時刻</span></label>
+              <div class="time-group">
+                <input type="number" name="f028:hour" placeholder="HH" min="0" max="23" required>
+                <span>:</span>
+                <input type="number" name="f028:minute" placeholder="MM" min="0" max="59" required>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- STAGE 3 -->
+      <section class="stage" id="stage-vehicle">
+        <div class="stage-head">
+          <span class="num">03</span>
+          <h2>Vehicle &amp; Luggage</h2>
+          <span class="jp">お車・お手荷物</span>
+        </div>
+        <div class="stage-body">
+
+          <div class="divider-label">Limousine 車種</div>
+          <div class="row cols-2">
+            <div class="field">
+              <label class="flabel" for="f014">Vehicle<span class="req">*</span></label>
+              <select id="f014" name="f014" required>
+                <option value="" selected>----- Please Select -----</option>
+                <option value="1">MAYBACH S-Class (3 PAX + 2 suitcases)</option>
+                <option value="2">MAYBACH GLS (3 PAX + 2 suitcases)</option>
+                <option value="3">BENTLEY BENTAYGA EWB AZURE (3 PAX + 2 suitcases)</option>
+                <option value="4">Lexus LM (3 PAX + 2 suitcases)</option>
+                <option value="5">BMW i7 (4 PAX + 1 suitcase)</option>
+                <option value="6">Toyota Century HV (4 PAX + 2 suitcases)</option>
+                <option value="7">Lexus LS500h (4 PAX + 1 suitcase)</option>
+                <option value="8">Mercedes-Benz "S" Class 4 Matic Long (4 PAX + 1 suitcase)</option>
+                <option value="9">Mercedes-Benz V220d (6 PAX + 2 suitcases)</option>
+                <option value="10">Toyota Crown FCEV (4 PAX + 1 suitcase)</option>
+                <option value="11">Toyota Crown HV / CrossOver (4 PAX + 2 suitcases)</option>
+                <option value="13">Toyota Alphard / Vellfire (6 PAX + 2 suitcases)</option>
+                <option value="14">Toyota Hiace VIP (7 PAX + 5 suitcases)</option>
+                <option value="15">Toyota Hiace (9 PAX + 9 suitcases)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="flabel" for="f015">Number of This Vehicle<span class="req">*</span></label>
+              <input type="number" id="f015" name="f015" min="1" required>
+            </div>
+          </div>
+
+          <div class="divider-label">Add Another Limousine 追加車両</div>
+          <div class="field">
+            <label class="flabel">Would you like to add another limousine?<span class="req">*</span></label>
+            <div class="choices">
+              <label class="choice"><input type="radio" name="f016" value="1" required><span>Yes</span></label>
+              <label class="choice"><input type="radio" name="f016" value="2"><span>No</span></label>
+            </div>
+          </div>
+          <div class="row cols-2">
+            <div class="field">
+              <label class="flabel" for="f017">Vehicle</label>
+              <select id="f017" name="f017">
+                <option value="" selected>----- Please Select -----</option>
+                <option value="1">MAYBACH S-Class</option>
+                <option value="2">MAYBACH GLS</option>
+                <option value="3">BENTLEY BENTAYGA EWB AZURE</option>
+                <option value="4">Lexus LM</option>
+                <option value="5">BMW i7</option>
+                <option value="6">Toyota Century HV</option>
+                <option value="7">Lexus LS500h</option>
+                <option value="8">Mercedes-Benz "S" Class 4 Matic Long</option>
+                <option value="9">Mercedes-Benz V220d</option>
+                <option value="10">Toyota Crown FCEV</option>
+                <option value="11">Toyota Crown HV / CrossOver</option>
+                <option value="13">Toyota Alphard / Vellfire</option>
+                <option value="14">Toyota Hiace VIP</option>
+                <option value="15">Toyota Hiace</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="flabel" for="f018">Number of Limousines</label>
+              <input type="number" id="f018" name="f018" min="0">
+            </div>
+          </div>
+
+          <div class="divider-label">Luggage お手荷物</div>
+          <div class="field">
+            <label class="flabel">Do you have luggage?<span class="req">*</span></label>
+            <div class="choices">
+              <label class="choice"><input type="radio" name="f020" value="1" required><span>Yes</span></label>
+              <label class="choice"><input type="radio" name="f020" value="2"><span>No</span></label>
+            </div>
+          </div>
+          <div class="row cols-2">
+            <div class="field">
+              <label class="flabel" for="f021">Large Items (25"~)</label>
+              <input type="text" id="f021" name="f021" placeholder="e.g. 2 suitcases">
+            </div>
+            <div class="field">
+              <label class="flabel" for="f022">Medium Items (23–24")</label>
+              <input type="text" id="f022" name="f022" placeholder="e.g. 2 suitcases">
+            </div>
+          </div>
+
+          <div class="divider-label">Child Seat チャイルドシート</div>
+          <div class="row cols-2">
+            <div class="field">
+              <label class="choice" style="display:inline-flex;">
+                <input type="checkbox" name="child_seat" value="1">
+                <span>I would like a child seat.</span>
+              </label>
+              <div class="note">Subject to availability. In Japan there is no legal obligation to use child seats for infants in taxis.</div>
+            </div>
+            <div class="field">
+              <label class="flabel" for="age">Child's Age</label>
+              <input type="number" id="age" name="age" min="0">
+            </div>
+          </div>
+
+          <div class="divider-label">Estimated Fare 概算料金</div>
+          <div class="field" id="sightseeingDurationField" style="display:none;">
+            <label class="flabel" for="durationSelect">Sightseeing Duration<span class="jp">貸切時間</span></label>
+            <select id="durationSelect">
+              <option value="1">1 hour or less</option>
+              <option value="1.5">1.5 hours</option>
+              <option value="2">2 hours</option>
+              <option value="2.5">2.5 hours</option>
+              <option value="3">3 hours</option>
+              <option value="3.5">3.5 hours</option>
+              <option value="4">4 hours</option>
+              <option value="4.5">4.5 hours</option>
+              <option value="5">5 hours</option>
+              <option value="5.5">5.5 hours</option>
+              <option value="6">6 hours</option>
+              <option value="6.5">6.5 hours</option>
+              <option value="7">7 hours</option>
+              <option value="7.5">7.5 hours</option>
+              <option value="8">8 hours</option>
+              <option value="8.5">8.5 hours</option>
+              <option value="9">9 hours</option>
+              <option value="9.5">9.5 hours</option>
+              <option value="10">10 hours</option>
+            </select>
+            <div class="note">Charged in 30-minute increments beyond 10 hours (+¥4,500 per Maybach S-Class). / 10時間超過分は30分毎に延長料金が加算されます。</div>
+          </div>
+
+          <div class="field">
+            <label class="choice" style="display:inline-flex;">
+              <input type="checkbox" id="englishDriver">
+              <span>Add an English-speaking driver (+¥1,000 per 30 min)<br>英会話ドライバーを希望する</span>
+            </label>
+          </div>
+
+          <div class="fare-card" id="fareCard"></div>
+
+        </div>
+      </section>
+
+      <!-- STAGE 4 -->
+      <section class="stage" id="stage-dropoff">
+        <div class="stage-head">
+          <span class="num">04</span>
+          <h2>Drop-off</h2>
+          <span class="jp">ご降車</span>
+        </div>
+        <div class="stage-body">
+
+          <div class="field">
+            <label class="flabel">Drop-off Location<span class="req">*</span><span class="jp">到着地</span></label>
+            <div class="choices vertical">
+              <label class="choice"><input type="radio" name="f029" value="1" required><span>JR Kyoto Station — MK VIP Station</span></label>
+              <label class="choice"><input type="radio" name="f029" value="2"><span>Kyoto Station Platform</span></label>
+              <label class="choice"><input type="radio" name="f029" value="3"><span>Kansai International Airport</span></label>
+              <label class="choice"><input type="radio" name="f029" value="4"><span>Itami Airport</span></label>
+              <label class="choice"><input type="radio" name="f029" value="5"><span>Hotel</span></label>
+              <label class="choice"><input type="radio" name="f029" value="6"><span>Other</span></label>
+            </div>
+            <div class="note">Drop-off at Kyoto Station platform requires a driver entrance fee.</div>
+          </div>
+
+          <div class="row cols-2">
+            <div class="field">
+              <label class="flabel" for="dropoff_detail">Drop-off Location Detail<span class="req">*</span><span class="jp">到着地の詳細</span></label>
+              <input type="text" id="dropoff_detail" name="dropoff_detail" placeholder="e.g. ○○ Hotel" required>
+            </div>
+            <div class="field">
+              <label class="flabel">Drop-off Time<span class="req">*</span><span class="jp">到着時刻</span></label>
+              <div class="time-group">
+                <input type="number" name="f034:hour" placeholder="HH" min="0" max="23" required>
+                <span>:</span>
+                <input type="number" name="f034:minute" placeholder="MM" min="0" max="59" required>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- STAGE 5 -->
+      <section class="stage" id="stage-confirm">
+        <div class="stage-head">
+          <span class="num">05</span>
+          <h2>Payment &amp; Confirmation</h2>
+          <span class="jp">お支払い・ご確認</span>
+        </div>
+        <div class="stage-body">
+
+          <div class="field">
+            <label class="flabel">Payment Method<span class="req">*</span><span class="jp">お支払い方法</span></label>
+            <div class="choices">
+              <label class="choice"><input type="radio" name="f035" value="1" required checked><span>Advance Payment (Credit Card via ZEUS)</span></label>
+            </div>
+            <div class="note">All reservations are settled by advance payment through ZEUS. No other payment method is available.<br>すべてのご予約はZEUSによる事前決済のみとなります。</div>
+          </div>
+
+          <div class="field">
+            <label class="flabel">Combine Transfer with Sightseeing?<span class="req">*</span><span class="jp">観光との組み合わせ</span></label>
+            <div class="choices">
+              <label class="choice"><input type="radio" name="f036" value="1" required><span>Yes</span></label>
+              <label class="choice"><input type="radio" name="f036" value="2"><span>No</span></label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="flabel" for="f037">Questions / Requests<span class="jp">ご質問・ご要望</span></label>
+            <textarea id="f037" name="f037"></textarea>
+          </div>
+
+          <div class="field">
+            <div class="remarks-box">
+              <h3>Remarks &amp; Cancellation Policy<br>注意事項・キャンセル規定</h3>
+
+              <div style="padding-top:0; border-top:none;">
+                <p style="margin:0 0 6px;"><strong>キャンセルポリシー</strong></p>
+                <p style="margin:0 0 6px;">キャンセル・変更は、前日正午までに弊社外商部までご連絡お願い致します。<br>
+                FAX：075-693-9466　TEL：075-757-6212（9:00〜17:30）</p>
+                <p style="margin:0 0 4px;">キャンセルの場合、以下の通りキャンセル料がかかります。ご注意下さい。</p>
+                <ul style="margin:0 0 10px;">
+                  <li>ご利用日前々日の17:30まで　0%</li>
+                  <li>ご利用日前日の正午まで　50%</li>
+                  <li>ご利用日前日の正午以降　100%</li>
+                </ul>
+                <p style="margin:0 0 4px;"><strong>【ご利用前日の正午以降に利用内容の変更のお申し出があった場合】</strong></p>
+                <ul style="margin:0 0 10px;">
+                  <li>対応できない場合がございます。</li>
+                  <li>利用時間短縮については元々の料金を申し受ける場合がございます。</li>
+                </ul>
+                <p style="margin:0;">ご不明な場合は弊社外商部にご連絡ください。</p>
+              </div>
+
+              <div style="margin-top:18px; padding-top:16px; border-top:1px dashed var(--gold-soft);">
+                <p style="margin:0 0 6px;"><strong>Cancellation Policy</strong></p>
+                <p style="margin:0 0 4px;">In case of cancellation, a cancellation fee will be charged as follows.</p>
+                <ul style="margin:0 0 10px;">
+                  <li>By 17:30 JST two days before: 0%</li>
+                  <li>After 17:30 JST two days before &amp; by 12:00 noon JST the day before: 50% of the fare</li>
+                  <li>After 12:00 noon JST the day before: 100% of the fare</li>
+                </ul>
+                <p style="margin:0 0 4px;"><strong>Change of Details</strong></p>
+                <p style="margin:0 0 4px;">In case you change the details after 12:00 noon JST the day before:</p>
+                <ul style="margin:0;">
+                  <li>If you delay your pick-up time, we will charge you from your original pick-up time.</li>
+                  <li>We may not be able to meet your request depending on availability.</li>
+                  <li>The original fee may be charged for shortening the usage time.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="flabel">I have read and understood the "Remarks."<span class="req">*</span><span class="jp">注意事項に同意します</span></label>
+            <div class="choices">
+              <label class="choice"><input type="radio" name="f039" value="1" required><span>Yes, I agree</span></label>
+            </div>
+          </div>
+
+          <input type="hidden" id="selectedCourse" name="selected_course" value="">
+          <input type="hidden" id="selectedHours" name="selected_hours" value="">
+
+          <div class="row cols-2">
+            <div class="field">
+              <label class="flabel">Subscribe to Newsletter?<span class="req">*</span><span class="jp">ニュースレター登録</span></label>
+              <div class="choices">
+                <label class="choice"><input type="radio" name="f040" value="1" required><span>Yes</span></label>
+                <label class="choice"><input type="radio" name="f040" value="2"><span>No</span></label>
+              </div>
+            </div>
+            <div class="field">
+              <label class="flabel" for="f041">How Did You Find Us?<span class="jp">当サイトを知ったきっかけ</span></label>
+              <select id="f041" name="f041">
+                <option value="" selected>----- Please Select -----</option>
+                <option value="1">Social Media (Facebook, Twitter, etc.)</option>
+                <option value="2">TripAdvisor</option>
+                <option value="3">Google Search / Ads</option>
+                <option value="4">Travel Agency / Friend Recommendation</option>
+                <option value="5">Kyoto Travel Guide</option>
+                <option value="6">Sharing Kyoto</option>
+                <option value="7">I've used MK Taxi before</option>
+                <option value="8">J-TripGateway</option>
+                <option value="9">None of the above</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="submit-bar">
+          <div class="hint">Submitting sends your request only — your booking is confirmed once MK replies by email (allow up to 2 business days).<br>送信後、MKからの確認メールをもってご予約成立となります。</div>
+          <button type="submit" class="cta">Send Reservation Request 送信する</button>
+        </div>
+      </section>
+
+    </form>
+
+    <div class="confirm-panel" id="confirmPanel" role="status" aria-live="polite">
+      <div class="seal">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 13l4 4L19 7"/></svg>
+      </div>
+      <h2>Thank you for your reservation request.</h2>
+      <p>ご予約リクエストありがとうございます。</p>
+      <p>Your reservation will be finalized once MK sends a confirmation email. This may take up to 2 business days. Please check your junk/spam folder for mail from @mk-group.co.jp.</p>
+    </div>
+
+  </main>
+</div>
+
+<footer>Kyoto MK — Airport Transfer &amp; Sightseeing<br>空港送迎・観光ハイヤー &nbsp;·&nbsp; This is a redesigned front-end mock-up and is not connected to MK's live reservation system.</footer>
+
+<script>
+  // Active rail state on scroll
+  const stops = Array.from(document.querySelectorAll('.stop'));
+  const sections = stops.map(s => document.querySelector(s.dataset.target));
+
+  stops.forEach(stop => {
+    stop.addEventListener('click', () => {
+      document.querySelector(stop.dataset.target).scrollIntoView({behavior: 'smooth', block: 'start'});
+    });
+  });
+
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const idx = sections.indexOf(entry.target);
+      if (idx === -1) return;
+      if (entry.isIntersecting){
+        stops.forEach((s,i) => {
+          s.classList.toggle('active', i === idx);
+          s.classList.toggle('done', i < idx);
+        });
+      }
+    });
+  }, {rootMargin: '-30% 0px -55% 0px', threshold: 0});
+
+  sections.forEach(sec => sec && obs.observe(sec));
+
+  // Prefill vehicle, passenger count, and (for Sightseeing) the selected course/duration
+  // when arriving from the Course Selection / Car Type Selection pages
+  (function prefillFromQuery(){
+    const params = new URLSearchParams(location.search);
+    const vehicleId = params.get('f014');
+    const paxCount = params.get('f011');
+    const courseName = params.get('courseName');
+    const hours = params.get('hours');
+    const resType = params.get('type');
+
+    if (vehicleId){
+      const select = document.getElementById('f014');
+      if (select) select.value = vehicleId;
+    }
+    if (paxCount){
+      const paxInput = document.getElementById('f011');
+      if (paxInput) paxInput.value = paxCount;
+    }
+    if (courseName) document.getElementById('selectedCourse').value = courseName;
+    if (hours) document.getElementById('selectedHours').value = hours;
+    if (hours && document.getElementById('durationSelect')) {
+      // Normalize "6.0" -> "6", "6.50" -> "6.5" so it matches an <option value>
+      const normalizedHours = String(parseFloat(hours));
+      const durationSelect = document.getElementById('durationSelect');
+      if ([...durationSelect.options].some(o => o.value === normalizedHours)) {
+        durationSelect.value = normalizedHours;
+      }
+    }
+
+    // Pre-select reservation type radio (f03) if it arrived via the homepage tabs
+    const typeToRadioValue = {transfer:'1', sightseeing:'2', taxi:'1'};
+    if (resType && typeToRadioValue[resType]){
+      const radio = document.querySelector('input[name="f03"][value="' + typeToRadioValue[resType] + '"]');
+      if (radio) radio.checked = true;
+    }
+
+    // Build a read-only trip summary so the guest can confirm what they picked earlier
+    const chips = [];
+    if (courseName) chips.push({label:'Course / コース', value: courseName});
+    if (hours) chips.push({label:'Duration / ご利用時間', value: hours + ' hours'});
+    if (vehicleId){
+      const vSelect = document.getElementById('f014');
+      const vLabel = vSelect ? vSelect.options[vSelect.selectedIndex]?.text : null;
+      if (vLabel) chips.push({label:'Vehicle / お車', value: vLabel});
+    }
+    if (paxCount) chips.push({label:'Passengers / 人数', value: paxCount});
+
+    if (chips.length){
+      const card = document.getElementById('tripSummaryCard');
+      card.style.display = 'block';
+      card.innerHTML =
+        '<p style="margin:0 0 10px;"><strong>Your selection so far<br>これまでの選択内容</strong></p>' +
+        '<div style="display:flex; flex-wrap:wrap; gap:10px;">' +
+        chips.map(c => '<span style="font-size:13px; background:#FBF1EF; border:1px solid var(--gold-soft); padding:6px 12px; border-radius:999px;"><strong>' + c.label + ':</strong> ' + c.value + '</span>').join('') +
+        '</div>';
+    }
+  })();
+
+  // ---------- Fare estimator ----------
+  // Rates transcribed from the MK Kyoto fare sheet (as of the 2026-06-21 revision).
+  // Several vehicles share an identical rate tier on the printed sheet; those tiers
+  // are defined once below and referenced by each vehicle ID.
+  const TIER_MAYBACH_S = {
+    hourly: {'1':76000,'1.5':76000,'2':76000,'2.5':76000,'3':76000,'3.5':80500,'4':85000,'4.5':89500,'5':94000,'5.5':98500,'6':103000,'6.5':107500,'7':112000,'7.5':116500,'8':121000,'8.5':125500,'9':130000,'9.5':134500,'10':139000},
+    extensionPer30min: 4500,
+    transferFlat: { kyotoStation: 76000, itami: 76000, kansai: 103000 }
+  };
+  const TIER_LM_CENTURY = {
+    hourly: {'1':46000,'1.5':46000,'2':46000,'2.5':46000,'3':46000,'3.5':50500,'4':55000,'4.5':59500,'5':64000,'5.5':68500,'6':73000,'6.5':77500,'7':82000,'7.5':86500,'8':91000,'8.5':95500,'9':100000,'9.5':104500,'10':109000},
+    extensionPer30min: 4500,
+    transferFlat: { kyotoStation: 46000, itami: 46000, kansai: 73000 }
+  };
+  const TIER_LS500H = {
+    hourly: {'1':41000,'1.5':41000,'2':41000,'2.5':41000,'3':41000,'3.5':45500,'4':50000,'4.5':54500,'5':59000,'5.5':63500,'6':68000,'6.5':72500,'7':77000,'7.5':81500,'8':86000,'8.5':90500,'9':95000,'9.5':99500,'10':104000},
+    extensionPer30min: 4500,
+    transferFlat: { kyotoStation: 41000, itami: 41000, kansai: 68000 }
+  };
+  const TIER_V220D = {
+    hourly: {'1':39600,'1.5':39600,'2':39600,'2.5':39600,'3':39600,'3.5':43300,'4':47000,'4.5':50700,'5':54400,'5.5':58100,'6':61800,'6.5':65500,'7':69200,'7.5':72900,'8':76600,'8.5':80300,'9':84000,'9.5':87700,'10':91400},
+    extensionPer30min: 3700,
+    transferFlat: { kyotoStation: 39600, itami: 39600, kansai: 61800 }
+  };
+  const TIER_CROWN = {
+    hourly: {'1':14800,'1.5':18500,'2':22200,'2.5':25900,'3':29600,'3.5':33300,'4':37000,'4.5':40700,'5':44400,'5.5':48100,'6':51800,'6.5':55500,'7':59200,'7.5':62900,'8':66600,'8.5':70300,'9':74000,'9.5':77700,'10':81400},
+    extensionPer30min: 3700,
+    transferFlat: { kyotoStation: 14800, itami: 29600, kansai: 51800 }
+  };
+  const TIER_ALPHARD = {
+    hourly: {'1':16800,'1.5':20500,'2':24200,'2.5':27900,'3':31600,'3.5':35300,'4':39000,'4.5':42700,'5':46400,'5.5':50100,'6':53800,'6.5':57500,'7':61200,'7.5':64900,'8':68600,'8.5':72300,'9':76000,'9.5':79700,'10':83400},
+    extensionPer30min: 3700,
+    transferFlat: { kyotoStation: 16800, itami: 31600, kansai: 53800 }
+  };
+  const TIER_HIACE_VIP = {
+    hourly: {'1':20400,'1.5':24250,'2':28100,'2.5':31950,'3':35800,'3.5':39650,'4':43500,'4.5':47350,'5':51200,'5.5':55050,'6':58900,'6.5':62750,'7':66600,'7.5':70450,'8':74300,'8.5':78150,'9':82000,'9.5':85850,'10':89700},
+    extensionPer30min: 3850,
+    transferFlat: { kyotoStation: 20400, itami: 35800, kansai: 58900 }
+  };
+  const TIER_HIACE_BLACKSEAT = { // "ブラックシートハイエース" column on the fare sheet
+    hourly: {'1':17400,'1.5':21250,'2':25100,'2.5':28950,'3':32800,'3.5':36650,'4':40500,'4.5':44350,'5':48200,'5.5':52050,'6':55900,'6.5':59750,'7':63600,'7.5':67450,'8':71300,'8.5':75150,'9':79000,'9.5':82850,'10':86700},
+    extensionPer30min: 3850,
+    transferFlat: { kyotoStation: 17400, itami: 32800, kansai: 55900 }
+  };
+  const FARE_TABLE = {
+    '1': TIER_MAYBACH_S,     // MAYBACH S-Class
+    '2': TIER_MAYBACH_S,     // MAYBACH GLS               — shares the sheet's rate with Maybach S-Class
+    '3': TIER_MAYBACH_S,     // BENTLEY BENTAYGA EWB AZURE — same tier
+    '4': TIER_LM_CENTURY,    // Lexus LM                  — shares tier with Century HV / BMW i7
+    '5': TIER_LM_CENTURY,    // BMW i7
+    '6': TIER_LM_CENTURY,    // Toyota Century HV
+    '7': TIER_LS500H,        // Lexus LS500h
+    '8': TIER_LS500H,        // Mercedes-Benz "S" Class 4Matic Long — shares tier with LS500h/EQS
+    '9': TIER_V220D,         // Mercedes-Benz V220d
+    '10': TIER_CROWN,        // Toyota Crown FCEV
+    '11': TIER_CROWN,        // Toyota Crown HV / CrossOver
+    '13': TIER_ALPHARD,      // Toyota Alphard / Vellfire
+    '14': TIER_HIACE_VIP,    // Toyota Hiace VIP (Luxury One Hiace)
+    '15': TIER_HIACE_BLACKSEAT, // Toyota Hiace — priced on the Black Seat Hiace column per instruction
+  };
+  const ENGLISH_DRIVER_FEE_PER_30MIN = 1000;
+  const yen = n => '¥' + n.toLocaleString('en-US');
+
+  function hourlyFare(vehicleId, hours){
+    const table = FARE_TABLE[vehicleId];
+    if (!table) return null;
+    const h = parseFloat(hours);
+    if (h <= 10) return table.hourly[String(h)] ?? null;
+    const extraBlocks = Math.ceil((h - 10) / 0.5);
+    return table.hourly['10'] + extraBlocks * table.extensionPer30min;
+  }
+
+  function transferFare(vehicleId, locationValue){
+    const table = FARE_TABLE[vehicleId];
+    if (!table) return null;
+    // f023 / f029 values: 1=Kyoto Sta(VIP) 2=Kyoto Sta platform 3=Kansai 4=Itami 5=Hotel 6=Other
+    if (locationValue === '3') return table.transferFlat.kansai;
+    if (locationValue === '1' || locationValue === '2') return table.transferFlat.kyotoStation;
+    if (locationValue === '4') return table.transferFlat.itami;
+    return null; // Hotel / Other — outside the flat-rate table, needs a manual quote
+  }
+
+  function updateFareCard(){
+    const card = document.getElementById('fareCard');
+    const vehicleId = document.getElementById('f014').value;
+    const resType = document.querySelector('input[name="f03"]:checked')?.value; // 1 transfer, 2 sightseeing, 3 both
+    const durationField = document.getElementById('sightseeingDurationField');
+    const isSightseeing = resType === '2' || resType === '3';
+    durationField.style.display = isSightseeing ? 'block' : 'none';
+
+    if (!vehicleId){
+      card.innerHTML = '<div class="fare-note">Select a vehicle above to see an estimated fare.</div>';
+      return;
+    }
+    if (!FARE_TABLE[vehicleId]){
+      card.innerHTML = '<div class="fare-note">Fare information for this vehicle is not yet available. MK will confirm the exact fare with your reservation.</div>';
+      return;
+    }
+
+    let base = null;
+    let baseLabel = '';
+    if (isSightseeing){
+      const hoursVal = document.getElementById('durationSelect').value;
+      base = hourlyFare(vehicleId, hoursVal);
+      baseLabel = 'Sightseeing (' + hoursVal + ' hours)';
+    } else {
+      const pickupVal = document.querySelector('input[name="f023"]:checked')?.value;
+      const dropoffVal = document.querySelector('input[name="f029"]:checked')?.value;
+      base = transferFare(vehicleId, pickupVal) ?? transferFare(vehicleId, dropoffVal);
+      baseLabel = 'One-way Transfer';
+    }
+
+    if (base === null){
+      card.innerHTML = '<div class="fare-note">This route isn\'t on the flat-rate table (Hotel / Other pick-up or drop-off). MK will confirm the exact fare with your reservation.</div>';
+      return;
+    }
+
+    const englishChecked = document.getElementById('englishDriver').checked;
+    let englishFee = 0;
+    if (englishChecked){
+      const hoursForFee = isSightseeing ? parseFloat(document.getElementById('durationSelect').value) : 1; // 1hr minimum estimate for transfers
+      englishFee = Math.ceil(hoursForFee / 0.5) * ENGLISH_DRIVER_FEE_PER_30MIN;
+    }
+    const total = base + englishFee;
+
+    card.innerHTML =
+      '<div class="row-line"><span>' + baseLabel + '</span><span>' + yen(base) + '</span></div>' +
+      (englishChecked ? '<div class="row-line"><span>English-speaking driver</span><span>+' + yen(englishFee) + '</span></div>' : '') +
+      '<div class="row-line total"><span>Estimated Total 概算合計</span><span>' + yen(total) + '</span></div>' +
+      '<div class="fare-note">Excludes admission, parking, tolls, and meals. Tax included. Final fare is confirmed by MK.' +
+      (!isSightseeing && englishChecked ? ' English-driver fee shown assumes a 1-hour trip; MK will adjust based on actual drive time.' : '') +
+      '</div>';
+  }
+
+  ['f014','durationSelect','englishDriver'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', updateFareCard);
+  });
+  document.querySelectorAll('input[name="f03"], input[name="f023"], input[name="f029"]').forEach(el => {
+    el.addEventListener('change', updateFareCard);
+  });
+  updateFareCard();
+
+  /* ---------- Serialize + send reservation email (admin + customer) ---------- */
+  function serializeForm(formEl){
+    const data = {};
+    formEl.querySelectorAll('input, select, textarea').forEach(el => {
+      const key = el.name || el.id;
+      if (!key) return;
+      if (el.type === 'radio' || el.type === 'checkbox'){
+        if (el.checked) data[key] = el.value;
+      } else {
+        data[key] = el.value;
+      }
+    });
+    return data;
+  }
+
+  function sendReservationEmail(formEl, serviceLabel){
+    const fields = serializeForm(formEl);
+    const emailEl = formEl.querySelector('input[type="email"]');
+    const customerEmail = emailEl ? emailEl.value : '';
+    const nameEl = document.getElementById('f06');
+    const customerName = nameEl ? nameEl.value : '';
+
+    return fetch('send-reservation.php', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ serviceLabel, customerEmail, customerName, fields })
+    }).catch(err => {
+      console.warn('Reservation email could not be sent (this is expected until the site is deployed to a server with send-reservation.php):', err);
+    });
+  }
+
+  // Submit -> send reservation emails, then show thank-you panel
+  const form = document.getElementById('reservationForm');
+  const confirmPanel = document.getElementById('confirmPanel');
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if (!form.checkValidity()){
+      form.reportValidity();
+      return;
+    }
+    sendReservationEmail(form, 'Kyoto MK Hire / Sightseeing Reservation');
+    form.style.display = 'none';
+    confirmPanel.classList.add('show');
+    confirmPanel.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+</script>
+
+</body>
+</html>

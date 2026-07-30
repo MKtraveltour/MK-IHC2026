@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MK KYOTO | Sightseeing Course</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --gold:#A9824A;
+    --gold-dark:#8A6B3B;
+    --gold-line:#C7A05E;
+    --cream:#EEE9DD;
+    --nav-bg:#ECE8DF;
+    --text-body:#8F8879;
+    --text-heading:#A9824A;
+    --lacquer:#9C3B3B;
+    --white:#FFFFFF;
+    --ink:#2A2620;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--white);
+    color:var(--ink);
+    font-family:'EB Garamond', serif;
+  }
+  .ui{font-family:'Poppins', sans-serif;}
+
+  /* ---------- Header (shared with Car Type page) ---------- */
+  header.site{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:22px 40px;
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand .logo{
+    width:44px; height:44px;
+    border-radius:10px;
+    overflow:hidden;
+    display:flex; flex-direction:column;
+    border:1px solid #ddd;
+  }
+  .brand .logo .top{flex:1; background:linear-gradient(135deg,#F4C15D,#F0A9C7); display:flex; align-items:center; justify-content:center;}
+  .brand .logo span{font-family:'Poppins',sans-serif; font-weight:700; font-size:12px; color:#111;}
+  .brand .wordmark{font-family:'Poppins',sans-serif; font-weight:700; font-size:17px; letter-spacing:.02em; color:#151515;}
+
+  .crumb{
+    text-align:center;
+    font-family:'Poppins',sans-serif;
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--text-body);
+    margin-top:4px;
+  }
+  .crumb strong{color:var(--gold-dark);}
+
+  /* ---------- Hero ---------- */
+  .hero{text-align:center; padding:36px 24px 50px;}
+  .hero h1{font-size:clamp(42px,6vw,64px); font-weight:400; color:var(--text-heading); margin:6px 0 18px;}
+  .hero .sub{font-size:20px; color:var(--gold-dark); margin:0 0 26px;}
+  .hero p{max-width:640px; margin:0 auto; color:var(--text-body); font-size:16.5px; line-height:1.75;}
+
+  /* ---------- Course list ---------- */
+  .band{background:var(--cream); padding:16px 24px 64px;}
+  .band-label{
+    text-align:center;
+    font-weight:500;
+    font-size:15px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--gold-dark);
+    padding-top:34px;
+    margin-bottom:34px;
+  }
+  .courses{max-width:920px; margin:0 auto; display:flex; flex-direction:column; gap:22px;}
+
+  /* ---------- Custom / free-plan section ---------- */
+  .custom-plan{padding:56px 24px 20px;}
+  .custom-plan-card{
+    max-width:720px; margin:0 auto; text-align:center; border:1px solid var(--gold-line); padding:44px 40px; background:var(--white);
+  }
+  .custom-plan-card h3{font-size:26px; font-weight:500; color:var(--ink); margin:0 0 8px;}
+  .custom-plan-card .jp{display:block; font-size:14px; color:var(--text-body); margin-bottom:20px;}
+  .custom-plan-card p{font-size:15.5px; color:var(--text-body); line-height:1.85; margin:0 0 28px;}
+  .custom-plan-card .select-btn{display:inline-block;}
+  .course-card{
+    background:#fff;
+    border:1px solid var(--gold-line);
+    padding:26px 30px;
+    display:grid;
+    grid-template-columns:44px 1fr auto;
+    align-items:center;
+    gap:22px;
+  }
+  .course-num{
+    font-size:30px;
+    color:var(--gold);
+    text-align:center;
+  }
+  .route{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:6px;
+    font-size:17px;
+  }
+  .route .stop{
+    border:1px solid var(--gold-line);
+    padding:5px 12px;
+    border-radius:3px;
+    color:var(--ink);
+    background:#FBF8F0;
+    text-decoration:none;
+    cursor:pointer;
+    transition:background .15s, border-color .15s;
+  }
+  .route a.stop:hover{
+    background:var(--gold);
+    border-color:var(--gold);
+    color:#fff;
+  }
+  .route .stop.anchor{
+    background:transparent;
+    border-color:transparent;
+    color:var(--text-body);
+    padding:5px 2px;
+    cursor:default;
+  }
+  .route .stop.anchor:hover{
+    background:transparent;
+    border-color:transparent;
+    color:var(--text-body);
+  }
+  .route .arrow{color:var(--gold); font-size:14px;}
+  .course-side{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:12px;
+  }
+  .duration-badge{
+    font-family:'Poppins',sans-serif;
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--gold-dark);
+    background:#F6EFDD;
+    padding:6px 14px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  .select-btn{
+    font-family:'Poppins',sans-serif;
+    font-size:12.5px;
+    font-weight:600;
+    letter-spacing:.03em;
+    color:var(--gold-dark);
+    background:#fff;
+    border:1px solid var(--gold);
+    border-radius:999px;
+    padding:12px 24px;
+    text-decoration:none;
+    white-space:nowrap;
+    transition:background .2s, color .2s;
+  }
+  .select-btn:hover{background:var(--gold); color:#fff;}
+
+  @media (max-width:700px){
+    .course-card{grid-template-columns:1fr; text-align:center;}
+    .course-side{align-items:center;}
+    .route{justify-content:center;}
+  }
+
+  /* ---------- Notes ---------- */
+  .notes{
+    max-width:920px;
+    margin:44px auto 0;
+    padding:22px 26px;
+    background:#fff;
+    border-left:3px solid var(--lacquer);
+    font-family:'Poppins',sans-serif;
+    font-size:12.5px;
+    color:var(--lacquer);
+    line-height:1.9;
+  }
+  .notes div{margin-bottom:4px;}
+  .notes div:last-child{margin-bottom:0;}
+
+  footer{
+    text-align:center;
+    font-family:'Poppins',sans-serif;
+    font-size:11.5px;
+    color:var(--text-body);
+    padding:30px 20px 50px;
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="brand">
+    <div class="logo"><div class="top"><span>MK</span></div></div>
+    <div class="wordmark">MK KYOTO</div>
+  </div>
+</header>
+
+<div class="crumb">Sightseeing 京都観光 <span aria-hidden="true">›</span> <strong>Course</strong></div>
+
+<section class="hero">
+  <h1>Sightseeing Course</h1>
+  <div class="sub">Popular routes, priced by time</div>
+  <p>Sightseeing hire is charged by the hour. Choose one of our most requested routes below, then select your vehicle and enter your details.</p>
+</section>
+
+<section class="band">
+  <div class="band-label">Popular with international guests</div>
+  <div class="courses" id="courseListShort"></div>
+</section>
+
+<section class="band">
+  <div class="band-label">Popular with international guests</div>
+  <div class="courses" id="courseList"></div>
+</section>
+
+<section class="custom-plan">
+  <div class="custom-plan-card">
+    <h3>Prefer something different?</h3>
+    <span class="jp">完全フリープランも可能です</span>
+    <p>お客様のご要望に合わせた完全オリジナルのコースの設定も可能です。<br>For our sightseeing hire plans, we can also create completely customized itineraries tailored to your specific requests.</p>
+    <a class="select-btn ui" href="kyoto-mk-reservation.html?type=sightseeing">Build Your Own Itinerary</a>
+  </div>
+</section>
+
+<div class="notes">
+  <div>・"Kyoto City" assumes a central Kyoto hotel (including Kyoto Station). Hotels outside the center may require additional time.</div>
+  <div>・Kiyomizu-dera / Kodai-ji may require an extra 30+ minutes during spring and autumn peak seasons.</div>
+  <div>・Meal time is not included. Please allow 30 minutes for a light meal, up to 2 hours for a kaiseki course.</div>
+</div>
+
+<footer>MK KYOTO — Course routes and durations shown here are reference examples; actual routing and timing are confirmed by MK.</footer>
+
+<script>
+  const courses = [
+    {
+      id: 1,
+      stops: ["Kyoto City","Fushimi Inari Taisha Shrine","Kiyomizu-dera Temple","Heian Shrine","Kyoto Gosho","Kyoto City"],
+      jp: "①京都市内〜伏見稲荷〜清水寺〜平安神宮〜御所〜京都市内",
+      hours: "6.0"
+    },
+    {
+      id: 2,
+      stops: ["Kyoto City","Fushimi Inari Taisha Shrine","Nijo Castle","Kinkaku-ji Temple","Ryoan-ji Temple","Kyoto City"],
+      jp: "②京都市内〜伏見稲荷〜二条城〜金閣寺〜龍安寺〜京都市内",
+      hours: "6.0"
+    },
+    {
+      id: 3,
+      stops: ["Kyoto City","Arashiyama Togetsukyo","Tenryu-ji Temple","Bamboo Grove","Ryoan-ji Temple","Kinkaku-ji Temple","Kyoto City"],
+      jp: "③京都市内〜嵐山渡月橋〜天龍寺〜竹林〜龍安寺〜金閣寺〜京都市内",
+      hours: "6.0"
+    },
+    {
+      id: 4,
+      stops: ["Kyoto City","Nijo Castle","Kinkaku-ji Temple","Ryoan-ji Temple","Arashiyama Togetsukyo","Kyoto City"],
+      jp: "④京都市内〜二条城〜金閣寺〜龍安寺〜嵐山渡月橋〜京都市内",
+      hours: "6.0"
+    },
+  ];
+
+  const shortCourses = [
+    {
+      id: 5,
+      stops: ["Kyoto City","Fushimi Inari Taisha Shrine","Sanjusangen-do","Kyoto City"],
+      jp: "①京都市内〜伏見稲荷〜三十三間堂〜京都市内",
+      hours: "4.0"
+    },
+    {
+      id: 6,
+      stops: ["Kyoto City","Kiyomizu-dera Temple","Yasaka Shrine","Gion","Kyoto City"],
+      jp: "②京都市内〜清水寺〜八坂神社〜祇園〜京都市内",
+      hours: "4.0"
+    },
+    {
+      id: 7,
+      stops: ["Kyoto City","Kinkaku-ji Temple","Ryoan-ji Temple","Kyoto City"],
+      jp: "③京都市内〜金閣寺〜龍安寺〜京都市内",
+      hours: "4.0"
+    },
+    {
+      id: 8,
+      stops: ["Kyoto City","Nijo Castle","Kinkaku-ji Temple","Kyoto City"],
+      jp: "④京都市内〜二条城〜金閣寺〜京都市内",
+      hours: "4.0"
+    },
+    {
+      id: 9,
+      stops: ["Kyoto City","Arashiyama Togetsukyo","Tenryu-ji Temple","Bamboo Grove","Kyoto City"],
+      jp: "⑤京都市内〜渡月橋〜天龍寺〜竹林〜京都市内",
+      hours: "4.0"
+    },
+  ];
+
+  const CIRCLED = "①②③④⑤⑥⑦⑧⑨";
+
+  function renderCourseList(targetEl, list, numberOffset){
+    targetEl.innerHTML = list.map(c => {
+      const routeHtml = c.stops.map((s, i) => {
+        const isAnchor = (i === 0 || i === c.stops.length - 1);
+        if (isAnchor){
+          return (i === 0 ? '' : '<span class="arrow">〜</span>') + '<span class="stop anchor">' + s + '</span>';
+        }
+        const mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(s + ', Kyoto, Japan');
+        const stopHtml = '<a class="stop" href="' + mapsUrl + '" target="_blank" rel="noopener">' + s + '</a>';
+        return '<span class="arrow">〜</span>' + stopHtml;
+      }).join('');
+
+      const qs = new URLSearchParams({
+        type: 'sightseeing',
+        course: c.id,
+        courseName: c.jp,
+        hours: c.hours
+      });
+
+      return `
+        <div class="course-card">
+          <div class="course-num">${CIRCLED[c.id - 1 - numberOffset] || c.id}</div>
+          <div class="route">${routeHtml}</div>
+          <div class="course-side">
+            <span class="duration-badge">${c.hours} hours</span>
+            <a class="select-btn ui" href="car-type-selection.html?${qs.toString()}">Select This Course</a>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  renderCourseList(document.getElementById('courseListShort'), shortCourses, 4);
+  renderCourseList(document.getElementById('courseList'), courses, 0);
+</script>
+
+</body>
+</html>
