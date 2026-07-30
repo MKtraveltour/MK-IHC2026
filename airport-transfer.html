@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MK KYOTO | Airport Transfer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --gold:#A9824A; --gold-dark:#8A6B3B; --gold-line:#C7A05E; --gold-soft:#D8BE93;
+    --cream:#EEE9DD; --text-body:#8F8879; --text-heading:#A9824A; --lacquer:#9C3B3B;
+    --white:#FFFFFF; --ink:#2A2620;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--white); color:var(--ink); font-family:'EB Garamond', serif; line-height:1.6;}
+  .ui{font-family:'Poppins', sans-serif;}
+
+  header.site{display:flex; align-items:center; justify-content:center; padding:26px 40px;}
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand .logo{width:44px; height:44px; border-radius:10px; overflow:hidden; display:flex; flex-direction:column; border:1px solid #ddd;}
+  .brand .logo .top{flex:1; background:linear-gradient(135deg,#F4C15D,#F0A9C7); display:flex; align-items:center; justify-content:center;}
+  .brand .logo span{font-family:'Poppins',sans-serif; font-weight:700; font-size:12px; color:#111;}
+  .brand .wordmark{font-family:'Poppins',sans-serif; font-weight:700; font-size:17px; letter-spacing:.02em; color:#151515;}
+
+  .hero{text-align:center; padding:20px 24px 10px;}
+  .hero h1{font-size:clamp(38px,5.5vw,58px); font-weight:400; color:var(--text-heading); margin:6px 0 14px;}
+  .hero .sub{font-size:18px; color:var(--gold-dark); margin:0 0 20px;}
+  .hero p{max-width:600px; margin:0 auto; color:var(--text-body); font-size:16px; line-height:1.75;}
+
+  .choices-wrap{max-width:980px; margin:50px auto 100px; padding:0 24px; display:grid; grid-template-columns:1fr 1fr; gap:28px;}
+  @media (max-width:760px){ .choices-wrap{grid-template-columns:1fr;} }
+
+  .service-card{
+    border:1px solid var(--gold-line); padding:36px 32px; display:flex; flex-direction:column; text-decoration:none; color:var(--ink);
+    transition:border-color .2s, box-shadow .2s;
+  }
+  .service-card:hover{border-color:var(--lacquer); box-shadow:0 12px 28px rgba(0,0,0,.06);}
+  .service-card .kicker{font-family:'Poppins',sans-serif; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--gold-dark); margin-bottom:14px;}
+  .service-card h2{font-size:28px; font-weight:500; margin:0 0 6px;}
+  .service-card .jp{font-size:14px; color:var(--text-body); margin-bottom:18px; display:block;}
+  .service-card p.desc{font-size:15px; color:var(--text-body); line-height:1.8; margin:0 0 24px; flex:1;}
+  .service-card ul{margin:0 0 24px; padding-left:18px; font-size:14px; color:var(--text-body); line-height:2;}
+  .service-card ul li b{color:var(--ink);}
+  .service-card .cta{
+    font-family:'Poppins',sans-serif; font-size:12.5px; font-weight:600; letter-spacing:.03em;
+    color:#fff; background:var(--ink); border-radius:999px; padding:14px 0; text-align:center; transition:background .2s;
+  }
+  .service-card:hover .cta{background:var(--lacquer);}
+
+  footer.site-footer{text-align:center; font-size:12px; color:var(--text-body); padding:0 20px 50px;}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="brand">
+    <div class="logo"><div class="top"><span>MK</span></div></div>
+    <div class="wordmark">MK KYOTO</div>
+  </div>
+</header>
+
+<section class="hero">
+  <h1>Airport Transfer</h1>
+  <div class="sub">Kyoto City ⇄ Kansai / Itami Airport</div>
+  <p>Choose the type of service that fits your trip.</p>
+</section>
+
+<div class="choices-wrap">
+
+  <a class="service-card" href="airport-transfer-premium.html">
+    <div class="kicker">Executive Hire</div>
+    <h2>English speaking driver and Stop over possible</h2>
+    <span class="jp">経由地・英会話ドライバー付きサービス</span>
+    <p class="desc">Private airport transfer service.</p>
+    <ul>
+      <li><b>Vehicle:</b> Named fleet (Maybach, Bentley, Lexus, Century HV, and more)</li>
+      <li><b>Fare:</b> Flat, per vehicle</li>
+      <li><b>Driver:</b> English-speaking on request, at no charge</li>
+      <li><b>Route:</b> Stops along the way are welcome</li>
+    </ul>
+    <span class="cta">Continue →</span>
+  </a>
+
+  <a class="service-card" href="airport-transfer-standard.html">
+    <div class="kicker">Flat-Rate Direct</div>
+    <h2>Direct Transfer by Area</h2>
+    <span class="jp">エリア別直行（日本語ドライバーのみ）定額サービス</span>
+    <p class="desc">Straightforward one-way transfer service.</p>
+    <ul>
+      <li><b>Vehicle:</b> Standard, Minivan, High-Grade, or Jumbo</li>
+      <li><b>Fare:</b> Flat, set by pick-up area</li>
+      <li><b>Driver:</b> Japanese-speaking only</li>
+      <li><b>Route:</b> Direct only, no stops</li>
+    </ul>
+    <span class="cta">Continue →</span>
+  </a>
+
+</div>
+
+<footer class="site-footer">MK KYOTO — Airport Transfer is a design mock-up and is not yet connected to a live booking system.</footer>
+
+</body>
+</html>
