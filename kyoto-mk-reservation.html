@@ -1112,6 +1112,39 @@
     confirmPanel.classList.add('show');
     confirmPanel.scrollIntoView({behavior:'smooth', block:'start'});
   });
+
+  /* ---------- Disable dependent fields when a Yes/No question is answered "No" ---------- */
+  function wireYesNoGate(radioName, dependentIds){
+    const radios = document.querySelectorAll(`input[name="${radioName}"]`);
+    if (!radios.length) return;
+    function apply(){
+      const selected = document.querySelector(`input[name="${radioName}"]:checked`);
+      const isNo = selected && selected.value === '2';
+      dependentIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.disabled = isNo;
+        if (isNo) el.value = '';
+      });
+    }
+    radios.forEach(r => r.addEventListener('change', apply));
+    apply();
+  }
+
+  wireYesNoGate('f016', ['f017', 'f018']); // Add Another Limousine -> Vehicle, Number of Limousines
+  wireYesNoGate('f020', ['f021', 'f022']); // Do you have luggage? -> Large Items, Medium Items
+
+  /* ---------- Disable child's age field unless the child seat checkbox is checked ---------- */
+  const childSeatCheckbox = document.querySelector('input[name="child_seat"]');
+  const childAgeInput = document.getElementById('age');
+  if (childSeatCheckbox && childAgeInput){
+    function applyChildSeat(){
+      childAgeInput.disabled = !childSeatCheckbox.checked;
+      if (!childSeatCheckbox.checked) childAgeInput.value = '';
+    }
+    childSeatCheckbox.addEventListener('change', applyChildSeat);
+    applyChildSeat();
+  }
 </script>
 
 </body>
