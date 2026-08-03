@@ -1159,6 +1159,9 @@
 
   function submitToGoogleForm(formEl){
     const payload = buildGoogleFormPayload(formEl);
+    console.log('=== GOOGLE FORM PAYLOAD (COPY THIS) ===');
+    console.log(JSON.stringify(payload, null, 2));
+    console.log('=== END PAYLOAD ===');
     const body = new URLSearchParams(payload);
     return fetch(GOOGLE_FORM_ACTION, {
       method: 'POST',
