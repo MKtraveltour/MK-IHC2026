@@ -173,6 +173,7 @@
   .class-picker-btn.selected{border-color:var(--gold); background:#FBF3E3; box-shadow:inset 0 0 0 1px var(--gold);}
   .class-picker-btn .cp-label{font-family:'Poppins',sans-serif; font-size:13.5px; font-weight:600; color:var(--ink);}
   .class-picker-btn .cp-models{font-size:11.5px; color:var(--text-body);}
+  .class-picker-btn .cp-price{font-family:'Poppins',sans-serif; font-size:13px; font-weight:700; color:var(--gold-dark); margin-top:4px;}
   .vehicle-result .tag{font-family:'Poppins',sans-serif; font-size:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--gold-dark); background:#F6EFDD; padding:3px 9px; border-radius:999px; display:inline-block; margin-bottom:8px;}
   .vehicle-result h4{margin:0 0 4px; font-size:22px; font-weight:500; color:var(--ink);}
   .vehicle-result .meta{font-size:14px; color:var(--text-body);}
@@ -843,11 +844,16 @@
       <div class="class-picker">
         <div class="class-picker-label">More than one vehicle class fits your group — please choose one:<span class="jp">条件に合う車種クラスが複数あります。お好きなクラスをお選びください：</span></div>
         <div class="class-picker-options">
-          ${eligiblePlans.map(p => `
+          ${eligiblePlans.map(p => {
+            const pSurcharge = TIME_SURCHARGE_CLASSES.includes(p.cls.key) ? TIME_SURCHARGE : 0;
+            const pFare = fareRangeFor(p.cls, state.airport, pSurcharge, p.count, meetFee);
+            return `
             <button type="button" class="class-picker-btn${p.cls.key === cls.key ? ' selected' : ''}" data-class-key="${p.cls.key}">
               <span class="cp-label">${p.cls.label}</span>
               <span class="cp-models">${p.cls.models}</span>
-            </button>`).join('')}
+              <span class="cp-price">${yen(pFare.totalMin)} – ${yen(pFare.totalMax)}</span>
+            </button>`;
+          }).join('')}
         </div>
       </div>` : '';
 
@@ -960,21 +966,42 @@
       if (hourEl && hourEl.value !== '') payload[entryBase + '_hour'] = String(parseInt(hourEl.value, 10));
       if (minuteEl && minuteEl.value !== '') payload[entryBase + '_minute'] = String(parseInt(minuteEl.value, 10));
     };
+    const addDate = (payload, entryBase, textId) => {
+      const raw = (get(textId) || '').trim();
+      if (!raw) return;
+      let year, month, day;
+      let m = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);      // 2026-08-27
+      if (m) { year = m[1]; month = m[2]; day = m[3]; }
+      if (!year) {
+        m = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);       // 08/27/2026
+        if (m) { month = m[1]; day = m[2]; year = m[3]; }
+      }
+      if (!year) {
+        m = raw.match(/^(\d{4})(\d{2})(\d{2})$/);                // 20260827
+        if (m) { year = m[1]; month = m[2]; day = m[3]; }
+      }
+      if (!year) return; // unrecognized format — leave blank rather than send something invalid
+      payload[entryBase + '_year']  = String(parseInt(year, 10));
+      payload[entryBase + '_month'] = String(parseInt(month, 10));
+      payload[entryBase + '_day']   = String(parseInt(day, 10));
+    };
+    const plan = autoPickPlan();
 
     const payload = {};
     payload['entry.136654059']  = DIRECTION_LABELS[direction] || '';
     payload['entry.105970329']  = AIRPORT_LABELS[state.airport] || '';
     payload['entry.684171988']  = get('paxSelect');
+    payload['entry.1815824845'] = plan ? plan.cls.label : '';
     payload['entry.1938377715'] = get('luggageInput');
-    payload['entry.920123684']  = get('travelDate');
+    addDate(payload, 'entry.920123684', 'travelDate');
     payload['entry.350702298']  = get('pickupDetail');
 
     if (direction === 'kyoto-to-airport'){
       payload['entry.1855987084'] = get('flightNumber');
-      addTime(payload, 'entry.1486971302', document.getElementById('pickupHour'), document.getElementById('pickupMinute'));
+      addTime(payload, 'entry.833128147', document.getElementById('pickupHour'), document.getElementById('pickupMinute'));
     } else {
       payload['entry.1855987084'] = get('flightNumberToKyoto');
-      addTime(payload, 'entry.1486971302', document.getElementById('landHour'), document.getElementById('landMinute'));
+      addTime(payload, 'entry.833128147', document.getElementById('landHour'), document.getElementById('landMinute'));
       payload['entry.2111910091'] = FLIGHT_TYPE_LABELS[getRadio('flightType')] || '';
       payload['entry.664859923']  = MEET_METHOD_LABELS[getRadio('meetMethod')] || '';
     }
