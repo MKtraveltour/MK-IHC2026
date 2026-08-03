@@ -1073,6 +1073,82 @@
     });
   }
 
+  /* ---------- Google Forms submission (Sightseeing Hire) ---------- */
+  const GOOGLE_FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSfA_MJLwHf6bqTc5RZGsYL0HvjtQrwcO3fNZLOpqH1hQFllPw/formResponse';
+
+  // Clean vehicle select values ("MAYBACH S-Class (3 PAX + 2 suitcases)" -> "MAYBACH S-Class")
+  function cleanVehicleLabel(value){
+    if (!value) return value;
+    return value.replace(/\s*\([^)]*\)\s*$/, '').trim();
+  }
+
+  // Radio/select value -> the exact label text expected by the Google Form
+  const GENDER_LABELS = { '1': 'Male', '2': 'Female', '3': 'Prefer not to say' };
+  const LOCATION_LABELS = {
+    '1': 'JR Kyoto Station-MK VIP',
+    '2': 'Kyoto Station Platform',
+    '3': 'Kansai Airport',
+    '4': 'Itami Airport',
+    '5': 'Hotel',
+    '6': 'Other'
+  };
+  const RESERVATION_TYPE_LABELS = { '1': 'Transfer', '2': 'Sightseeing', '3': 'Transfer + Sightseeing' };
+  const YES_NO_LABELS = { '1': 'Yes', '2': 'No' };
+  const AGREE_LABELS = { '1': 'Yes, I agree.' };
+
+  function buildGoogleFormPayload(formEl){
+    const get = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+    const getRadio = name => { const el = formEl.querySelector(`input[name="${name}"]:checked`); return el ? el.value : ''; };
+    const combineTime = (hourName, minuteName) => {
+      const h = formEl.querySelector(`input[name="${hourName}"]`);
+      const m = formEl.querySelector(`input[name="${minuteName}"]`);
+      if (!h || !m || h.value === '' || m.value === '') return '';
+      return String(h.value).padStart(2,'0') + ':' + String(m.value).padStart(2,'0');
+    };
+
+    const payload = {};
+    payload['entry.457335513']  = RESERVATION_TYPE_LABELS[getRadio('f03')] || '';
+    payload['entry.1015191623'] = get('f06');
+    payload['entry.430979050']  = GENDER_LABELS[getRadio('f07')] || '';
+    payload['entry.552721145']  = get('f08');
+    payload['entry.1298894553'] = get('f09');
+    payload['entry.384153130']  = get('f043');
+    payload['entry.386523087']  = get('f011');
+    payload['entry.1066879217'] = LOCATION_LABELS[getRadio('f023')] || '';
+    payload['entry.1781897771'] = get('place1_detail');
+    payload['entry.932457977']  = combineTime('f028:hour', 'f028:minute');
+    payload['entry.1437065592'] = cleanVehicleLabel(get('f014'));
+    payload['entry.587102793']  = get('f015');
+    payload['entry.542168724']  = YES_NO_LABELS[getRadio('f016')] || '';
+    payload['entry.535365893']  = cleanVehicleLabel(get('f017'));
+    payload['entry.1249558521'] = get('f018');
+    payload['entry.1567477394'] = YES_NO_LABELS[getRadio('f020')] || '';
+    payload['entry.966159980']  = get('f021');
+    payload['entry.712863006']  = get('f022');
+    payload['entry.1104652793'] = get('age');
+    payload['entry.2027347429'] = (() => { const v = get('durationSelect'); return v ? v + ' hour' + (parseFloat(v) === 1 ? '' : 's') : ''; })();
+    payload['entry.1932893002'] = LOCATION_LABELS[getRadio('f029')] || '';
+    payload['entry.401850731']  = get('dropoff_detail');
+    payload['entry.1947738610'] = combineTime('f034:hour', 'f034:minute');
+    payload['entry.375936657']  = YES_NO_LABELS[getRadio('f036')] || '';
+    payload['entry.628245324']  = get('f037');
+    payload['entry.2045874042'] = AGREE_LABELS[getRadio('f039')] || '';
+    return payload;
+  }
+
+  function submitToGoogleForm(formEl){
+    const payload = buildGoogleFormPayload(formEl);
+    const body = new URLSearchParams(payload);
+    return fetch(GOOGLE_FORM_ACTION, {
+      method: 'POST',
+      mode: 'no-cors', // Google Forms does not return CORS headers; we can't read the response, but the submission still goes through
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: body.toString()
+    }).catch(err => {
+      console.warn('Google Form submission failed:', err);
+    });
+  }
+
   // Submit -> send reservation emails, then show thank-you panel
   const form = document.getElementById('reservationForm');
   const confirmPanel = document.getElementById('confirmPanel');
@@ -1083,6 +1159,7 @@
       return;
     }
     sendReservationEmail(form, 'Kyoto MK Hire / Sightseeing Reservation');
+    submitToGoogleForm(form);
     form.style.display = 'none';
     confirmPanel.classList.add('show');
     confirmPanel.scrollIntoView({behavior:'smooth', block:'start'});
