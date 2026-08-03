@@ -538,6 +538,18 @@
     {key:'jumbo', label:'Jumbo', models:'Toyota Hiace', pax:9, luggage:9},
   ];
 
+  // Minivan / High-Grade can carry up to 5 suitcases instead of 2 when there are 3 or fewer
+  // passengers — but this requires one passenger to sit in the front passenger seat.
+  const EXTENDED_LUGGAGE_CLASSES = ['minivan', 'highgrade'];
+  const EXTENDED_LUGGAGE_MAX_PAX = 3;
+  const EXTENDED_LUGGAGE_CAPACITY = 5;
+  function effectiveLuggageCapacity(cls){
+    if (EXTENDED_LUGGAGE_CLASSES.includes(cls.key) && state.pax <= EXTENDED_LUGGAGE_MAX_PAX){
+      return EXTENDED_LUGGAGE_CAPACITY;
+    }
+    return cls.luggage;
+  }
+
   const yen = n => '¥' + n.toLocaleString('en-US');
 
   const TOLL_FEES = {
@@ -771,7 +783,7 @@
   let selectedClassKey = null; // used only when more than one class qualifies for the same pax/luggage
 
   function getEligiblePlans(){
-    const fits = ZONE_CLASSES.filter(c => c.pax >= state.pax && c.luggage >= state.luggage);
+    const fits = ZONE_CLASSES.filter(c => c.pax >= state.pax && effectiveLuggageCapacity(c) >= state.luggage);
     if (fits.length){
       // only offer a choice among classes that share the exact same capacity threshold as the cheapest fit —
       // a strictly larger class (e.g. Jumbo) should not appear as a "tied" alternative to Minivan/High-Grade
@@ -829,6 +841,7 @@
       return;
     }
     const { cls, count } = plan;
+    const usesExtendedLuggage = EXTENDED_LUGGAGE_CLASSES.includes(cls.key) && state.luggage > cls.luggage;
     const eligiblePlans = getEligiblePlans();
     const hasChoice = eligiblePlans.length > 1;
     const toll = TOLL_FEES[direction][state.airport];
@@ -865,7 +878,9 @@
           <h4>${cls.models}</h4>
           <div class="meta">${count > 1
             ? `${count} vehicles arranged together — up to ${cls.pax * count} passengers · ${cls.luggage * count} suitcases combined`
-            : `Up to ${cls.pax} passengers · ${cls.luggage} suitcase${cls.luggage === 1 ? '' : 's'}`}</div>
+            : usesExtendedLuggage
+              ? `Up to ${cls.pax} passengers · ${EXTENDED_LUGGAGE_CAPACITY} suitcases (3 or fewer passengers only)`
+              : `Up to ${cls.pax} passengers · ${cls.luggage} suitcase${cls.luggage === 1 ? '' : 's'}`}</div>
         </div>
         <div class="price-block">
           <span class="amount">${yen(totalMin)} – ${yen(totalMax)}</span>
@@ -886,7 +901,8 @@
           ${rows.map(r => `<div class="fare-range-row"><span>${r.label}</span><span>(${yen(r.vehicleFare)} + ${yen(r.toll)} toll${r.surcharge > 0 ? ' + ' + yen(r.surcharge) + ' time fee' : ''}${r.meetFee > 0 ? ' + ' + yen(r.meetFee) + ' meet fee' : ''})${count > 1 ? ' × ' + count : ''} = <b>${yen(r.total)}</b></span></div>`).join('')}
         </div>
       </details>
-      ${count > 1 ? '<div class="note" style="margin-top:10px;">Your group size or luggage requires more than one vehicle. MK will coordinate ' + count + ' Jumbo vehicles to travel together.</div>' : ''}`;
+      ${count > 1 ? '<div class="note" style="margin-top:10px;">Your group size or luggage requires more than one vehicle. MK will coordinate ' + count + ' Jumbo vehicles to travel together.</div>' : ''}
+      ${usesExtendedLuggage ? '<div class="note" style="margin-top:10px;">For 3 passengers or fewer, ' + cls.label + ' can carry up to 5 suitcases — one passenger will need to sit in the front passenger seat.<br><span class="jp">3名以下のご利用の場合、' + cls.label + 'は最大5個までのスーツケースを載せられますが、お客様1名に助手席へのご乗車をお願いいたします。</span></div>' : ''}`;
 
     if (hasChoice){
       box.querySelectorAll('.class-picker-btn').forEach(btn => {
@@ -967,20 +983,39 @@
       if (minuteEl && minuteEl.value !== '') payload[entryBase + '_minute'] = String(parseInt(minuteEl.value, 10));
     };
     const addDate = (payload, entryBase, textId) => {
-      const raw = (get(textId) || '').trim();
+      let raw = (get(textId) || '').trim();
       if (!raw) return;
+      // normalize full-width digits (０-９) to half-width (0-9)
+      raw = raw.replace(/[０-９]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0));
       let year, month, day;
-      let m = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);      // 2026-08-27
+      // Japanese format: 2026年8月16日
+      let m = raw.match(/(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日?/);
       if (m) { year = m[1]; month = m[2]; day = m[3]; }
       if (!year) {
-        m = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);       // 08/27/2026
+        m = raw.match(/^(\d{4})[-.\/](\d{1,2})[-.\/](\d{1,2})$/);   // 2026-08-27 / 2026/08/27 / 2026.08.27
+        if (m) { year = m[1]; month = m[2]; day = m[3]; }
+      }
+      if (!year) {
+        m = raw.match(/^(\d{1,2})[-.\/](\d{1,2})[-.\/](\d{4})$/);   // 08/27/2026
         if (m) { month = m[1]; day = m[2]; year = m[3]; }
       }
       if (!year) {
-        m = raw.match(/^(\d{4})(\d{2})(\d{2})$/);                // 20260827
+        m = raw.match(/^(\d{4})(\d{2})(\d{2})$/);                    // 20260827
         if (m) { year = m[1]; month = m[2]; day = m[3]; }
       }
-      if (!year) return; // unrecognized format — leave blank rather than send something invalid
+      if (!year) {
+        // last resort: pull out any 3 numbers and guess by size (4-digit one is the year)
+        const nums = raw.match(/\d+/g);
+        if (nums && nums.length >= 3){
+          const yIdx = nums.findIndex(n => n.length === 4);
+          if (yIdx !== -1){
+            year = nums[yIdx];
+            const rest = nums.filter((_, i) => i !== yIdx);
+            month = rest[0]; day = rest[1];
+          }
+        }
+      }
+      if (!year) return; // still unrecognized — leave blank rather than send something invalid
       payload[entryBase + '_year']  = String(parseInt(year, 10));
       payload[entryBase + '_month'] = String(parseInt(month, 10));
       payload[entryBase + '_day']   = String(parseInt(day, 10));
