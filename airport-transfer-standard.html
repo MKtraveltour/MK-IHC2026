@@ -973,6 +973,7 @@
   const FLIGHT_TYPE_LABELS = { 'domestic': 'Domestic', 'international': 'International' };
   const MEET_METHOD_LABELS = { 'normal': 'Normal', 'meetService': 'Meet Service' };
   const PAYMENT_LABELS = { '1': 'Advance Payment (Credit Card via ZEUS)' };
+  const GENDER_LABELS_STD = { '1': 'Male', '2': 'Female', '3': 'N/A' };
   const AGREE_LABELS_STD = { '1': 'Yes, I agree' };
 
   function buildGoogleFormPayloadStd(formEl){
@@ -1036,12 +1037,14 @@
       addTime(payload, 'entry.833128147', document.getElementById('pickupHour'), document.getElementById('pickupMinute'));
     } else {
       payload['entry.1855987084'] = get('flightNumberToKyoto');
-      addTime(payload, 'entry.833128147', document.getElementById('landHour'), document.getElementById('landMinute'));
+      addTime(payload, 'entry.1486971302', document.getElementById('landHour'), document.getElementById('landMinute'));
       payload['entry.2111910091'] = FLIGHT_TYPE_LABELS[getRadio('flightType')] || '';
       payload['entry.664859923']  = MEET_METHOD_LABELS[getRadio('meetMethod')] || '';
     }
 
-    payload['entry.416703276']  = get('fullName');
+    payload['entry.1597942574'] = get('fullName');
+    payload['entry.881657212']  = GENDER_LABELS_STD[getRadio('gender')] || '';
+    payload['entry.416703276']  = get('email');
     payload['entry.1545337236'] = (() => {
       const numEl = document.getElementById('phone');
       const codeEl = document.getElementById('countryCode');
