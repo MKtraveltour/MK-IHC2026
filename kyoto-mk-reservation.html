@@ -801,6 +801,8 @@
 
     </form>
 
+    <div id="debugPayloadBox" style="display:none; max-width:700px; margin:20px auto; padding:16px; border:3px solid red; background:#fff; font-family:monospace; font-size:13px; white-space:pre-wrap; word-break:break-all;"></div>
+
     <div class="confirm-panel" id="confirmPanel" role="status" aria-live="polite">
       <div class="seal">
         <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 13l4 4L19 7"/></svg>
@@ -1159,9 +1161,12 @@
 
   function submitToGoogleForm(formEl){
     const payload = buildGoogleFormPayload(formEl);
-    console.log('=== GOOGLE FORM PAYLOAD (COPY THIS) ===');
-    console.log(JSON.stringify(payload, null, 2));
-    console.log('=== END PAYLOAD ===');
+    const debugBox = document.getElementById('debugPayloadBox');
+    if (debugBox){
+      debugBox.style.display = 'block';
+      debugBox.textContent = '送信内容（この赤枠を全部コピーして送ってください）:\n\n' + JSON.stringify(payload, null, 2);
+      debugBox.scrollIntoView({behavior:'smooth', block:'center'});
+    }
     const body = new URLSearchParams(payload);
     return fetch(GOOGLE_FORM_ACTION, {
       method: 'POST',
@@ -1186,7 +1191,12 @@
     submitToGoogleForm(form);
     form.style.display = 'none';
     confirmPanel.classList.add('show');
-    confirmPanel.scrollIntoView({behavior:'smooth', block:'start'});
+    const debugBox = document.getElementById('debugPayloadBox');
+    if (debugBox && debugBox.style.display === 'block'){
+      debugBox.scrollIntoView({behavior:'smooth', block:'center'});
+    } else {
+      confirmPanel.scrollIntoView({behavior:'smooth', block:'start'});
+    }
   });
 
   /* ---------- Disable dependent fields when a Yes/No question is answered "No" ---------- */
