@@ -484,8 +484,6 @@
 
     </form>
 
-    <div id="debugPayloadBox" style="display:none; max-width:700px; margin:20px auto; padding:16px; border:3px solid red; background:#fff; font-family:monospace; font-size:13px; white-space:pre-wrap; word-break:break-all;"></div>
-
     <div class="confirm-panel" id="confirmPanel" role="status" aria-live="polite">
       <div class="seal"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 13l4 4L19 7"/></svg></div>
       <h2>Thank you for your reservation request.</h2>
@@ -965,120 +963,22 @@
     });
   }
 
-  /* ---------- Google Forms submission (test) ---------- */
-  const GOOGLE_FORM_ACTION_STD = 'https://docs.google.com/forms/d/e/1FAIpQLSeQ84y6JzuoX_hMjAdr4BF_ee0CI-lc8AvofaDFXVxLh3dc0A/formResponse';
+  /* ---------- Apps Script submission (writes to Sheet + sends emails) ---------- */
+  const APPS_SCRIPT_URL_STD = 'https://script.google.com/macros/s/AKfycbwXH32AIQMIjRctjHC9FMVDtKeddLXFgeFu14OgaUEMf0jQoxGkj3P5BTQ6D-0cINNvRg/exec';
 
-  const DIRECTION_LABELS = { 'kyoto-to-airport': 'Kyoto \u2192 Airport', 'airport-to-kyoto': 'Airport \u2192 Kyoto' };
-  const AIRPORT_LABELS = { 'kansai': 'Kansai International Airport', 'itami': 'Osaka Itami Airport' };
-  const FLIGHT_TYPE_LABELS = { 'domestic': 'Domestic', 'international': 'International' };
-  const MEET_METHOD_LABELS = { 'normal': 'Normal', 'meetService': 'Meet Service' };
-  const PAYMENT_LABELS = { '1': 'Advance Payment (Credit Card via ZEUS)' };
-  const GENDER_LABELS_STD = { '1': 'Male', '2': 'Female', '3': 'N/A' };
-  const AGREE_LABELS_STD = { '1': 'Yes, I agree' };
+  function submitToAppsScript(formEl, serviceLabel){
+    const fields = serializeForm(formEl);
+    const emailEl = document.getElementById('email');
+    const customerEmail = emailEl ? emailEl.value : '';
+    const nameEl = document.getElementById('fullName');
+    const customerName = nameEl ? nameEl.value : '';
 
-  function buildGoogleFormPayloadStd(formEl){
-    const get = id => { const el = document.getElementById(id); return el ? el.value : ''; };
-    const getRadio = name => { const el = formEl.querySelector(`input[name="${name}"]:checked`); return el ? el.value : ''; };
-    const addTime = (payload, entryBase, hourEl, minuteEl) => {
-      if (hourEl && hourEl.value !== '') payload[entryBase + '_hour'] = String(parseInt(hourEl.value, 10));
-      if (minuteEl && minuteEl.value !== '') payload[entryBase + '_minute'] = String(parseInt(minuteEl.value, 10));
-    };
-    const addDate = (payload, entryBase, textId) => {
-      let raw = (get(textId) || '').trim();
-      if (!raw) return;
-      // normalize full-width digits (０-９) to half-width (0-9)
-      raw = raw.replace(/[０-９]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0));
-      let year, month, day;
-      // Japanese format: 2026年8月16日
-      let m = raw.match(/(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日?/);
-      if (m) { year = m[1]; month = m[2]; day = m[3]; }
-      if (!year) {
-        m = raw.match(/^(\d{4})[-.\/](\d{1,2})[-.\/](\d{1,2})$/);   // 2026-08-27 / 2026/08/27 / 2026.08.27
-        if (m) { year = m[1]; month = m[2]; day = m[3]; }
-      }
-      if (!year) {
-        m = raw.match(/^(\d{1,2})[-.\/](\d{1,2})[-.\/](\d{4})$/);   // 08/27/2026
-        if (m) { month = m[1]; day = m[2]; year = m[3]; }
-      }
-      if (!year) {
-        m = raw.match(/^(\d{4})(\d{2})(\d{2})$/);                    // 20260827
-        if (m) { year = m[1]; month = m[2]; day = m[3]; }
-      }
-      if (!year) {
-        // last resort: pull out any 3 numbers and guess by size (4-digit one is the year)
-        const nums = raw.match(/\d+/g);
-        if (nums && nums.length >= 3){
-          const yIdx = nums.findIndex(n => n.length === 4);
-          if (yIdx !== -1){
-            year = nums[yIdx];
-            const rest = nums.filter((_, i) => i !== yIdx);
-            month = rest[0]; day = rest[1];
-          }
-        }
-      }
-      if (!year) return; // still unrecognized — leave blank rather than send something invalid
-      payload[entryBase + '_year']  = String(parseInt(year, 10));
-      payload[entryBase + '_month'] = String(parseInt(month, 10));
-      payload[entryBase + '_day']   = String(parseInt(day, 10));
-    };
-    const plan = autoPickPlan();
-
-    const payload = {};
-    payload['entry.136654059']  = DIRECTION_LABELS[direction] || '';
-    payload['entry.105970329']  = AIRPORT_LABELS[state.airport] || '';
-    payload['entry.684171988']  = get('paxSelect');
-    payload['entry.1815824845'] = plan ? plan.cls.label : '';
-    payload['entry.1938377715'] = get('luggageInput');
-    addDate(payload, 'entry.920123684', 'travelDate');
-    payload['entry.350702298']  = get('pickupDetail');
-
-    if (direction === 'kyoto-to-airport'){
-      payload['entry.1855987084'] = get('flightNumber');
-      addTime(payload, 'entry.833128147', document.getElementById('pickupHour'), document.getElementById('pickupMinute'));
-    } else {
-      payload['entry.1855987084'] = get('flightNumberToKyoto');
-      addTime(payload, 'entry.1486971302', document.getElementById('landHour'), document.getElementById('landMinute'));
-      payload['entry.2111910091'] = FLIGHT_TYPE_LABELS[getRadio('flightType')] || '';
-      payload['entry.664859923']  = MEET_METHOD_LABELS[getRadio('meetMethod')] || '';
-    }
-
-    payload['entry.1597942574'] = get('fullName');
-    payload['entry.881657212']  = GENDER_LABELS_STD[getRadio('gender')] || '';
-    payload['entry.416703276']  = get('email');
-    payload['entry.1545337236'] = (() => {
-      const numEl = document.getElementById('phone');
-      const codeEl = document.getElementById('countryCode');
-      const num = numEl ? numEl.value.trim() : '';
-      if (!num) return '';
-      let dial = '';
-      if (codeEl && codeEl.selectedIndex >= 0){
-        const m = codeEl.options[codeEl.selectedIndex].text.match(/\+\d+/);
-        if (m) dial = m[0] + ' ';
-      }
-      return dial + num;
-    })();
-    payload['entry.229689927']  = PAYMENT_LABELS[getRadio('payment')] || '';
-    payload['entry.1648015959'] = get('questions');
-    payload['entry.1682369867'] = AGREE_LABELS_STD[getRadio('agree')] || '';
-    return payload;
-  }
-
-  function submitToGoogleFormStd(formEl){
-    const payload = buildGoogleFormPayloadStd(formEl);
-    const debugBox = document.getElementById('debugPayloadBox');
-    if (debugBox){
-      debugBox.style.display = 'block';
-      debugBox.textContent = '送信内容（この赤枠を全部コピーして送ってください）:\n\n' + JSON.stringify(payload, null, 2);
-      debugBox.scrollIntoView({behavior:'smooth', block:'center'});
-    }
-    const body = new URLSearchParams(payload);
-    return fetch(GOOGLE_FORM_ACTION_STD, {
+    return fetch(APPS_SCRIPT_URL_STD, {
       method: 'POST',
-      mode: 'no-cors',
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      body: body.toString()
+      headers: {'Content-Type': 'text/plain;charset=utf-8'}, // avoids a CORS preflight, which Apps Script web apps don't support
+      body: JSON.stringify({ serviceLabel, customerEmail, customerName, fields })
     }).catch(err => {
-      console.warn('Google Form submission failed:', err);
+      console.warn('Apps Script submission failed:', err);
     });
   }
 
@@ -1101,16 +1001,11 @@
       return;
     }
     sendReservationEmail(form, 'Direct Flat-Rate Airport Transfer');
-    submitToGoogleFormStd(form);
+    submitToAppsScript(form, 'Direct Flat-Rate Airport Transfer');
     document.querySelectorAll('.stage').forEach(s => s.style.display = 'none');
     const panel = document.getElementById('confirmPanel');
     panel.classList.add('show');
-    const debugBox = document.getElementById('debugPayloadBox');
-    if (debugBox && debugBox.style.display === 'block'){
-      debugBox.scrollIntoView({behavior:'smooth', block:'center'});
-    } else {
-      panel.scrollIntoView({behavior:'smooth', block:'start'});
-    }
+    panel.scrollIntoView({behavior:'smooth', block:'start'});
   });
 </script>
 
