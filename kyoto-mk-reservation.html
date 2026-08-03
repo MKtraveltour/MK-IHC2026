@@ -1099,11 +1099,32 @@
   function buildGoogleFormPayload(formEl){
     const get = id => { const el = document.getElementById(id); return el ? el.value : ''; };
     const getRadio = name => { const el = formEl.querySelector(`input[name="${name}"]:checked`); return el ? el.value : ''; };
-    const combineTime = (hourName, minuteName) => {
+
+    // Google Forms' native time question actually submits two separate
+    // sub-fields (entry.XXXX_hour / entry.XXXX_minute), not one combined string.
+    const addTime = (payload, entryBase, hourName, minuteName) => {
       const h = formEl.querySelector(`input[name="${hourName}"]`);
       const m = formEl.querySelector(`input[name="${minuteName}"]`);
-      if (!h || !m || h.value === '' || m.value === '') return '';
-      return String(h.value).padStart(2,'0') + ':' + String(m.value).padStart(2,'0');
+      if (h && h.value !== '') payload[entryBase + '_hour'] = String(parseInt(h.value, 10));
+      if (m && m.value !== '') payload[entryBase + '_minute'] = String(parseInt(m.value, 10));
+    };
+
+    // Google Forms' native date question submits entry.XXXX_year / _month / _day.
+    // Our own field is free text (placeholder "Month/Day/Year"), so parse flexibly.
+    const addDate = (payload, entryBase, textId) => {
+      const raw = (get(textId) || '').trim();
+      if (!raw) return;
+      let year, month, day;
+      let m = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);      // 2026-08-27
+      if (m) { year = m[1]; month = m[2]; day = m[3]; }
+      if (!year) {
+        m = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);       // 08/27/2026
+        if (m) { month = m[1]; day = m[2]; year = m[3]; }
+      }
+      if (!year) return; // unrecognized format — leave the date field blank rather than send something invalid
+      payload[entryBase + '_year']  = String(parseInt(year, 10));
+      payload[entryBase + '_month'] = String(parseInt(month, 10));
+      payload[entryBase + '_day']   = String(parseInt(day, 10));
     };
 
     const payload = {};
@@ -1112,11 +1133,11 @@
     payload['entry.430979050']  = GENDER_LABELS[getRadio('f07')] || '';
     payload['entry.552721145']  = get('f08');
     payload['entry.1298894553'] = get('f09');
-    payload['entry.384153130']  = get('f043');
+    addDate(payload, 'entry.384153130', 'f043');
     payload['entry.386523087']  = get('f011');
     payload['entry.1066879217'] = LOCATION_LABELS[getRadio('f023')] || '';
     payload['entry.1781897771'] = get('place1_detail');
-    payload['entry.932457977']  = combineTime('f028:hour', 'f028:minute');
+    addTime(payload, 'entry.932457977', 'f028:hour', 'f028:minute');
     payload['entry.1437065592'] = cleanVehicleLabel(get('f014'));
     payload['entry.587102793']  = get('f015');
     payload['entry.542168724']  = YES_NO_LABELS[getRadio('f016')] || '';
@@ -1129,7 +1150,7 @@
     payload['entry.2027347429'] = (() => { const v = get('durationSelect'); return v ? v + ' hour' + (parseFloat(v) === 1 ? '' : 's') : ''; })();
     payload['entry.1932893002'] = LOCATION_LABELS[getRadio('f029')] || '';
     payload['entry.401850731']  = get('dropoff_detail');
-    payload['entry.1947738610'] = combineTime('f034:hour', 'f034:minute');
+    addTime(payload, 'entry.1947738610', 'f034:hour', 'f034:minute');
     payload['entry.375936657']  = YES_NO_LABELS[getRadio('f036')] || '';
     payload['entry.628245324']  = get('f037');
     payload['entry.2045874042'] = AGREE_LABELS[getRadio('f039')] || '';
