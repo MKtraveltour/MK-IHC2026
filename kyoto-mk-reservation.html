@@ -515,9 +515,9 @@
             <div class="field">
               <label class="flabel">Pick-up Time<span class="req">*</span><span class="jp">出発時刻</span></label>
               <div class="time-group">
-                <input type="number" name="f028:hour" placeholder="HH" min="0" max="23" required>
+                <input type="number" id="pickupHour" name="f028:hour" placeholder="HH" min="0" max="23" required>
                 <span>:</span>
-                <input type="number" name="f028:minute" placeholder="MM" min="0" max="59" required>
+                <input type="number" id="pickupMinute" name="f028:minute" placeholder="MM" min="0" max="59" required>
               </div>
             </div>
           </div>
@@ -623,7 +623,7 @@
                 <input type="checkbox" name="child_seat" value="1">
                 <span>I would like a child seat.</span>
               </label>
-              <div class="note">Subject to availability. In Japan there is no legal obligation to use child seats for infants in taxis.</div>
+              <div class="note">A separate rental fee (¥550–¥1,100) applies. Please note that rentals may not be available depending on current inventory. Additionally, there is no legal requirement in Japan to use a child safety seat for infants or toddlers in taxis.</div>
             </div>
             <div class="field">
               <label class="flabel" for="age">Child's Age</label>
@@ -700,10 +700,11 @@
             <div class="field">
               <label class="flabel">Drop-off Time<span class="req">*</span><span class="jp">到着時刻</span></label>
               <div class="time-group">
-                <input type="number" name="f034:hour" placeholder="HH" min="0" max="23" required>
+                <input type="number" id="dropoffHour" name="f034:hour" placeholder="HH" min="0" max="23" required>
                 <span>:</span>
-                <input type="number" name="f034:minute" placeholder="MM" min="0" max="59" required>
+                <input type="number" id="dropoffMinute" name="f034:minute" placeholder="MM" min="0" max="59" required>
               </div>
+              <div class="note">Automatically calculated from your pick-up time and sightseeing duration — you can adjust it if needed.<br>配車時間と貸切時間から自動計算されます（必要に応じて修正できます）。</div>
             </div>
           </div>
 
@@ -725,14 +726,6 @@
               <label class="choice"><input type="radio" name="f035" value="1" required checked><span>Advance Payment (Credit Card via ZEUS)</span></label>
             </div>
             <div class="note">All reservations are settled by advance payment through ZEUS. No other payment method is available.<br>すべてのご予約はZEUSによる事前決済のみとなります。</div>
-          </div>
-
-          <div class="field">
-            <label class="flabel">Combine Transfer with Sightseeing?<span class="req">*</span><span class="jp">観光との組み合わせ</span></label>
-            <div class="choices">
-              <label class="choice"><input type="radio" name="f036" value="1" required><span>Yes</span></label>
-              <label class="choice"><input type="radio" name="f036" value="2"><span>No</span></label>
-            </div>
           </div>
 
           <div class="field">
@@ -1040,6 +1033,32 @@
   document.querySelectorAll('input[name="f03"], input[name="f023"], input[name="f029"]').forEach(el => {
     el.addEventListener('change', updateFareCard);
   });
+
+  /* ---------- Auto-calculate Drop-off Time from Pick-up Time + Sightseeing Duration ---------- */
+  function updateDropoffTime(){
+    const pickupHourEl = document.getElementById('pickupHour');
+    const pickupMinuteEl = document.getElementById('pickupMinute');
+    const durationEl = document.getElementById('durationSelect');
+    const dropoffHourEl = document.getElementById('dropoffHour');
+    const dropoffMinuteEl = document.getElementById('dropoffMinute');
+    if (!pickupHourEl || !pickupMinuteEl || !durationEl || !dropoffHourEl || !dropoffMinuteEl) return;
+
+    const pickupHour = pickupHourEl.value;
+    const pickupMinute = pickupMinuteEl.value;
+    const duration = parseFloat(durationEl.value);
+    if (pickupHour === '' || pickupMinute === '' || !duration) return;
+
+    const pickupTotalMinutes = parseInt(pickupHour, 10) * 60 + parseInt(pickupMinute, 10);
+    const dropoffTotalMinutes = Math.round((pickupTotalMinutes + duration * 60) % 1440);
+    dropoffHourEl.value = Math.floor(dropoffTotalMinutes / 60);
+    dropoffMinuteEl.value = dropoffTotalMinutes % 60;
+  }
+  ['pickupHour','pickupMinute'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', updateDropoffTime);
+  });
+  const durationSelectForDropoff = document.getElementById('durationSelect');
+  if (durationSelectForDropoff) durationSelectForDropoff.addEventListener('change', updateDropoffTime);
   updateFareCard();
 
   /* ---------- Serialize + send reservation email (admin + customer) ---------- */
