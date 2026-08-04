@@ -32,12 +32,29 @@
   .choices-wrap{max-width:1160px; margin:50px auto 100px; padding:0 24px; display:grid; grid-template-columns:1fr; gap:22px;}
 
   .service-card{
+    position:relative; overflow:hidden; isolation:isolate;
     border:1px solid var(--gold-line); padding:32px 36px; display:flex; flex-direction:row; align-items:center; gap:32px; text-decoration:none; color:var(--ink);
     transition:border-color .2s, box-shadow .2s;
   }
   .service-card:hover{border-color:var(--lacquer); box-shadow:0 12px 28px rgba(0,0,0,.06);}
-  .service-card .card-main{flex:2; min-width:0;}
-  .service-card .card-side{flex:0 0 220px; display:flex; flex-direction:column; align-items:stretch; gap:10px;}
+
+  /* --- Background photo layer ---
+     .bg-photo sits behind everything. Right now it shows a placeholder gradient
+     via --card-bg. When real photos are ready, just set:
+       style="--card-bg:url('images/xxx.jpg')"
+     on the .bg-photo div (keep the same class/markup, only the url changes). */
+  .service-card .bg-photo{
+    position:absolute; inset:0; z-index:0;
+    background-image:var(--card-bg); background-size:cover; background-position:center;
+    opacity:.85;
+  }
+  .service-card .bg-photo::after{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(90deg, rgba(255,255,255,.94) 0%, rgba(255,255,255,.88) 55%, rgba(255,255,255,.55) 100%);
+  }
+
+  .service-card .card-main{position:relative; z-index:1; flex:2; min-width:0;}
+  .service-card .card-side{position:relative; z-index:1; flex:0 0 220px; display:flex; flex-direction:column; align-items:stretch; gap:10px;}
   .service-card .kicker{font-family:'Poppins',sans-serif; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--gold-dark); margin-bottom:14px;}
   .service-card h2{font-size:26px; font-weight:500; margin:0 0 6px;}
   .service-card .jp{font-size:14px; color:var(--text-body); margin-bottom:18px; display:block;}
@@ -62,6 +79,7 @@
   @media (max-width:760px){
     .service-card{flex-direction:column; align-items:stretch; gap:0;}
     .service-card .card-side{flex:none;}
+    .service-card .bg-photo::after{background:linear-gradient(180deg, rgba(255,255,255,.7) 0%, rgba(255,255,255,.94) 45%);}
   }
 
   footer.site-footer{text-align:center; font-size:12px; color:var(--text-body); padding:0 20px 50px;}
@@ -85,6 +103,7 @@
 <div class="choices-wrap">
 
   <div class="service-card no-link">
+    <div class="bg-photo" style="--card-bg:linear-gradient(135deg,#F4C15D,#F0A9C7);"></div>
     <div class="card-main">
       <div class="kicker">Original Tours</div>
       <h2>Limited, Exclusive Experiences</h2>
@@ -104,6 +123,7 @@
   </div>
 
   <a class="service-card" href="airport-transfer.html">
+    <div class="bg-photo" style="--card-bg:linear-gradient(135deg,#7FA8C9,#BFDCEC);"></div>
     <div class="card-main">
       <div class="kicker">Airport Transfer</div>
       <h2>Kyoto ⇄ Kansai / Itami Airport</h2>
@@ -120,6 +140,7 @@
   </a>
 
   <a class="service-card" href="course-selection.html">
+    <div class="bg-photo" style="--card-bg:linear-gradient(135deg,#C97B63,#EBC09B);"></div>
     <div class="card-main">
       <div class="kicker">Sightseeing Hire Service</div>
       <h2>Sightseeing &amp; Custom Itineraries</h2>
@@ -136,6 +157,7 @@
   </a>
 
   <a class="service-card" href="distance-taxi.html">
+    <div class="bg-photo" style="--card-bg:linear-gradient(135deg,#F2C14E,#F8E3A4);"></div>
     <div class="card-main">
       <div class="kicker">Distance-Based Taxi</div>
       <h2>Call a Metered Taxi</h2>
