@@ -375,7 +375,7 @@
 
             <div class="field">
               <div class="remarks-box">
-                <p style="margin:0;">For Executive Hire, your driver always waits at the <strong>International Arrivals South Exit</strong>, holding a sign with your name — no meeting-method selection is needed, and this is included in your fare.<br><span class="jp">エグゼクティブ・ハイヤーでは、ドライバーが必ず国際線到着ロビーの南到着口にてお客様のお名前を書いたボードを持ってお待ちいたします。待ち合わせ方法の選択は不要で、料金に含まれております。</span></p>
+                <p style="margin:0;">For Executive Hire, your driver always waits at the <strong>International Arrivals South Exit</strong> or <strong>Domestic Arrivals</strong>, depending on your flight, holding a sign with your name — no meeting-method selection is needed, and this is included in your fare.<br><span class="jp">エグゼクティブ・ハイヤーでは、ドライバーが必ず国際線/国内線到着ロビーの南到着口にてお客様のお名前を書いたボードを持ってお待ちいたします。待ち合わせ方法の選択は不要で、料金に含まれております。</span></p>
               </div>
               <div class="meet-point-photos" id="meetPointPhotos"></div>
             </div>
@@ -433,11 +433,11 @@
           <div class="row cols-2">
             <div class="field">
               <label class="flabel" for="luggageLarge">Large Items (25"~)<span class="req">*</span></label>
-              <input type="text" id="luggageLarge" placeholder="e.g. 2 suitcases" required>
+              <input type="number" id="luggageLarge" min="0" value="0" required>
             </div>
             <div class="field">
               <label class="flabel" for="luggageMedium">Medium Items (23–24")<span class="req">*</span></label>
-              <input type="text" id="luggageMedium" placeholder="e.g. 2 suitcases" required>
+              <input type="number" id="luggageMedium" min="0" value="0" required>
             </div>
           </div>
 
@@ -687,13 +687,17 @@
 
   function renderVehicleCards(){
     const pax = parseInt(paxCountInput.value || '1', 10);
+    const luggageLargeEl = document.getElementById('luggageLarge');
+    const luggageMediumEl = document.getElementById('luggageMedium');
+    const totalLuggage = (parseInt(luggageLargeEl && luggageLargeEl.value || '0', 10) || 0)
+      + (parseInt(luggageMediumEl && luggageMediumEl.value || '0', 10) || 0);
     const matches = Object.keys(PREMIUM_FLEET)
       .map(id => ({id, ...PREMIUM_FLEET[id]}))
-      .filter(v => v.pax >= pax)
+      .filter(v => v.pax >= pax && v.luggage >= totalLuggage)
       .sort((a,b) => a.pax - b.pax);
 
     if (!matches.length){
-      vehicleCardsEl.innerHTML = '<div class="empty-msg">No vehicle in this fleet accommodates this many passengers. Please contact MK directly.</div>';
+      vehicleCardsEl.innerHTML = '<div class="empty-msg">No vehicle in this fleet accommodates this many passengers and/or this much luggage. Please reduce the amount, or contact MK directly for a custom arrangement.<br><span class="jp">この人数・お荷物の量に対応できる車両がありません。人数・荷物点数を見直すか、MKに直接お問い合わせください。</span></div>';
       return;
     }
     if (selectedVehicleId && !matches.find(v => v.id === selectedVehicleId)){
@@ -731,6 +735,10 @@
   });
 
   paxCountInput.addEventListener('input', () => { renderVehicleCards(); updateFareCard(); });
+  ['luggageLarge','luggageMedium'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', () => { renderVehicleCards(); updateFareCard(); });
+  });
 
   const TOLL_FEES = {
     'kyoto-to-airport': { kansai: 5500, itami: 2700 },
@@ -800,7 +808,7 @@
     const fields = serializeForm(formEl);
     const emailEl = formEl.querySelector('input[type="email"]');
     const customerEmail = emailEl ? emailEl.value : '';
-    const nameEl = document.getElementById('fullName');
+    const nameEl = document.getElementById('customerName');
     const customerName = nameEl ? nameEl.value : '';
 
     return fetch('send-reservation.php', {
@@ -819,7 +827,7 @@
     const fields = serializeForm(formEl);
     const emailEl = formEl.querySelector('input[type="email"]');
     const customerEmail = emailEl ? emailEl.value : '';
-    const nameEl = document.getElementById('fullName');
+    const nameEl = document.getElementById('customerName');
     const customerName = nameEl ? nameEl.value : '';
 
     return fetch(APPS_SCRIPT_URL_PREMIUM, {
