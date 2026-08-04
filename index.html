@@ -9,9 +9,9 @@
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --gold:#A9824A; --gold-dark:#8A6B3B; --gold-line:#C7A05E; --gold-soft:#D8BE93;
-    --cream:#EEE9DD; --text-body:#8F8879; --text-heading:#A9824A; --lacquer:#9C3B3B;
-    --white:#FFFFFF; --ink:#2A2620;
+    --gold:#8B6F47; --gold-dark:#8B6F47; --gold-line:#8B6F47; --gold-soft:#C9B79A;
+    --cream:#F8F6F1; --text-body:#4B5563; --text-heading:#8B6F47; --lacquer:#5C8D4A;
+    --white:#FFFFFF; --ink:#2B2B2B; --btn:#7A1F2B;
   }
   *{box-sizing:border-box;}
   body{margin:0; background:var(--white); color:var(--ink); font-family:'EB Garamond', serif; line-height:1.6;}
@@ -32,7 +32,7 @@
   .choices-wrap{max-width:1160px; margin:50px auto 100px; padding:0 24px; display:grid; grid-template-columns:1fr; gap:22px;}
 
   .service-card{
-    position:relative; overflow:hidden; isolation:isolate;
+    position:relative; overflow:hidden; isolation:isolate; background:rgba(255,255,255,.55);
     border:1px solid var(--gold-line); padding:32px 36px; display:flex; flex-direction:row; align-items:center; gap:32px; text-decoration:none; color:var(--ink);
     transition:border-color .2s, box-shadow .2s;
   }
@@ -41,7 +41,7 @@
   /* --- Background photo layer ---
      .bg-photo sits behind everything. Right now it shows a placeholder gradient
      via --card-bg. When real photos are ready, just set:
-       style="--card-bg:url('images/xxx.jpg')"
+       style="--card-bg:url('xxx.jpg')"
      on the .bg-photo div (keep the same class/markup, only the url changes). */
   .service-card .bg-photo{
     position:absolute; inset:0; z-index:0;
@@ -50,7 +50,7 @@
   }
   .service-card .bg-photo::after{
     content:""; position:absolute; inset:0;
-    background:linear-gradient(90deg, rgba(255,255,255,.94) 0%, rgba(255,255,255,.88) 55%, rgba(255,255,255,.55) 100%);
+    background:linear-gradient(90deg, rgba(255,255,255,.94) 0%, rgba(255,255,255,.8) 55%, rgba(255,255,255,.35) 100%);
   }
 
   .service-card .card-main{position:relative; z-index:1; flex:2; min-width:0;}
@@ -65,21 +65,21 @@
   .service-card ul li b{color:var(--ink);}
   .service-card .cta{
     font-family:'Poppins',sans-serif; font-size:12.5px; font-weight:600; letter-spacing:.03em;
-    color:#fff; background:var(--ink); border-radius:999px; padding:14px 0; text-align:center; transition:background .2s;
+    color:#fff; background:var(--btn); border-radius:999px; padding:14px 0; text-align:center; transition:background .2s;
   }
   .service-card:hover .cta{background:var(--lacquer);}
   .service-card.no-link:hover{border-color:var(--gold-line); box-shadow:none;}
   .cta-group{display:flex; flex-direction:column; gap:10px;}
   .cta-btn{
     font-family:'Poppins',sans-serif; font-size:12.5px; font-weight:600; letter-spacing:.03em; text-decoration:none;
-    color:#fff; background:var(--ink); border-radius:999px; padding:14px 0; text-align:center; transition:background .2s;
+    color:#fff; background:var(--btn); border-radius:999px; padding:14px 0; text-align:center; transition:background .2s;
   }
   .cta-btn:hover{background:var(--lacquer);}
 
   @media (max-width:760px){
     .service-card{flex-direction:column; align-items:stretch; gap:0;}
     .service-card .card-side{flex:none;}
-    .service-card .bg-photo::after{background:linear-gradient(180deg, rgba(255,255,255,.7) 0%, rgba(255,255,255,.94) 45%);}
+    .service-card .bg-photo::after{background:linear-gradient(180deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.85) 45%);}
   }
 
   footer.site-footer{text-align:center; font-size:12px; color:var(--text-body); padding:0 20px 50px;}
