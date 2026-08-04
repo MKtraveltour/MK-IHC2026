@@ -812,6 +812,25 @@
     });
   }
 
+  /* ---------- Apps Script submission (writes to Sheet + sends emails) ---------- */
+  const APPS_SCRIPT_URL_PREMIUM = 'https://script.google.com/macros/s/AKfycbwHOgcvexCfxl2ME7RdSIY3Pr2f5aci02ahssfMY3lpRTJfOkbWIoUwNjRIZJF8FYogWQ/exec';
+
+  function submitToAppsScript(formEl, serviceLabel){
+    const fields = serializeForm(formEl);
+    const emailEl = formEl.querySelector('input[type="email"]');
+    const customerEmail = emailEl ? emailEl.value : '';
+    const nameEl = document.getElementById('fullName');
+    const customerName = nameEl ? nameEl.value : '';
+
+    return fetch(APPS_SCRIPT_URL_PREMIUM, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'}, // avoids a CORS preflight, which Apps Script web apps don't support
+      body: JSON.stringify({ serviceLabel, customerEmail, customerName, fields })
+    }).catch(err => {
+      console.warn('Apps Script submission failed:', err);
+    });
+  }
+
   /* ---------- Submit ---------- */
   const form = document.getElementById('reservationForm');
   const confirmPanel = document.getElementById('confirmPanel');
@@ -826,6 +845,7 @@
       return;
     }
     sendReservationEmail(form, 'Executive Hire Airport Transfer');
+    submitToAppsScript(form, 'Executive Hire Airport Transfer');
     form.style.display = 'none';
     confirmPanel.classList.add('show');
     confirmPanel.scrollIntoView({behavior:'smooth', block:'start'});
