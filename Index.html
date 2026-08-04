@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MK KYOTO | Reservations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --gold:#A9824A; --gold-dark:#8A6B3B; --gold-line:#C7A05E; --gold-soft:#D8BE93;
+    --cream:#EEE9DD; --text-body:#8F8879; --text-heading:#A9824A; --lacquer:#9C3B3B;
+    --white:#FFFFFF; --ink:#2A2620;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--white); color:var(--ink); font-family:'EB Garamond', serif; line-height:1.6;}
+  .ui{font-family:'Poppins', sans-serif;}
+
+  header.site{display:flex; align-items:center; justify-content:center; padding:26px 40px;}
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand .logo{width:44px; height:44px; border-radius:10px; overflow:hidden; display:flex; flex-direction:column; border:1px solid #ddd;}
+  .brand .logo .top{flex:1; background:linear-gradient(135deg,#F4C15D,#F0A9C7); display:flex; align-items:center; justify-content:center;}
+  .brand .logo span{font-family:'Poppins',sans-serif; font-weight:700; font-size:12px; color:#111;}
+  .brand .wordmark{font-family:'Poppins',sans-serif; font-weight:700; font-size:17px; letter-spacing:.02em; color:#151515;}
+
+  .hero{text-align:center; padding:20px 24px 10px;}
+  .hero h1{font-size:clamp(38px,5.5vw,58px); font-weight:400; color:var(--text-heading); margin:6px 0 14px;}
+  .hero .sub{font-size:18px; color:var(--gold-dark); margin:0 0 20px;}
+  .hero p{max-width:600px; margin:0 auto; color:var(--text-body); font-size:16px; line-height:1.75;}
+
+  .choices-wrap{max-width:1160px; margin:50px auto 100px; padding:0 24px; display:grid; grid-template-columns:1fr; gap:22px;}
+
+  .service-card{
+    border:1px solid var(--gold-line); padding:32px 36px; display:flex; flex-direction:row; align-items:center; gap:32px; text-decoration:none; color:var(--ink);
+    transition:border-color .2s, box-shadow .2s;
+  }
+  .service-card:hover{border-color:var(--lacquer); box-shadow:0 12px 28px rgba(0,0,0,.06);}
+  .service-card .card-main{flex:2; min-width:0;}
+  .service-card .card-side{flex:0 0 220px; display:flex; flex-direction:column; align-items:stretch; gap:10px;}
+  .service-card .kicker{font-family:'Poppins',sans-serif; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--gold-dark); margin-bottom:14px;}
+  .service-card h2{font-size:26px; font-weight:500; margin:0 0 6px;}
+  .service-card .jp{font-size:14px; color:var(--text-body); margin-bottom:18px; display:block;}
+  .service-card p.desc .jp{font-size:13.5px; color:var(--text-body); display:block; margin-top:4px; opacity:.85;}
+  .service-card ul li .jp{font-size:13px; color:var(--text-body); display:block; margin-top:2px; opacity:.85;}
+  .service-card p.desc{font-size:15px; color:var(--text-body); line-height:1.8; margin:0 0 18px;}
+  .service-card ul{margin:0; padding-left:18px; font-size:14px; color:var(--text-body); line-height:2;}
+  .service-card ul li b{color:var(--ink);}
+  .service-card .cta{
+    font-family:'Poppins',sans-serif; font-size:12.5px; font-weight:600; letter-spacing:.03em;
+    color:#fff; background:var(--ink); border-radius:999px; padding:14px 0; text-align:center; transition:background .2s;
+  }
+  .service-card:hover .cta{background:var(--lacquer);}
+  .service-card.no-link:hover{border-color:var(--gold-line); box-shadow:none;}
+  .cta-group{display:flex; flex-direction:column; gap:10px;}
+  .cta-btn{
+    font-family:'Poppins',sans-serif; font-size:12.5px; font-weight:600; letter-spacing:.03em; text-decoration:none;
+    color:#fff; background:var(--ink); border-radius:999px; padding:14px 0; text-align:center; transition:background .2s;
+  }
+  .cta-btn:hover{background:var(--lacquer);}
+
+  @media (max-width:760px){
+    .service-card{flex-direction:column; align-items:stretch; gap:0;}
+    .service-card .card-side{flex:none;}
+  }
+
+  footer.site-footer{text-align:center; font-size:12px; color:var(--text-body); padding:0 20px 50px;}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="brand">
+    <div class="logo"><div class="top"><span>MK</span></div></div>
+    <div class="wordmark">MK KYOTO</div>
+  </div>
+</header>
+
+<section class="hero">
+  <h1>Reservations</h1>
+  <div class="sub">ご予約</div>
+  <p>Choose the service you'd like to book. Each option will guide you through the steps needed to complete your reservation.</p>
+</section>
+
+<div class="choices-wrap">
+
+  <a class="service-card" href="course-selection.html">
+    <div class="card-main">
+      <div class="kicker">Sightseeing Hire Service</div>
+      <h2>Sightseeing &amp; Custom Itineraries</h2>
+      <span class="jp">観光ハイヤー・貸切観光サービス</span>
+      <p class="desc">Charter a private vehicle by the hour to go around Kyoto's most popular sights, or build a fully custom itinerary.<span class="jp">専用車を時間単位でチャーターして、京都の最も人気のある観光スポットを巡ったり、完全にカスタマイズした旅程を組み立てたりできます。</span></p>
+      <ul>
+        <li><b>Choose:</b> a popular route, or a completely custom plan<span class="jp">人気のルート、または完全にカスタマイズされたプランをお選びください。</span></li>
+        <li><b>Then:</b> select your vehicle and enter your preferred reservation details.<span class="jp">次に、車両を選択し、希望の予約詳細を入力します。</span></li>
+      </ul>
+    </div>
+    <div class="card-side">
+      <span class="cta">Start Your Reservation →</span>
+    </div>
+  </a>
+
+  <a class="service-card" href="airport-transfer.html">
+    <div class="card-main">
+      <div class="kicker">Airport Transfer</div>
+      <h2>Kyoto ⇄ Kansai / Itami Airport</h2>
+      <span class="jp">空港送迎（ハイヤー・定額直行）</span>
+      <p class="desc">Choose between an Executive Hire with a your preferred vehicle and English-speaking driver, or a straightforward flat-rate direct transfer.<span class="jp">お好みの車種を選択し、英語を話すドライバーを手配できるエグゼクティブハイヤーサービス、または簡単な定額料金の直接送迎サービスのいずれかを選択してください。</span></p>
+      <ul>
+        <li><b>Executive Hire service:</b> your preferred vehicle, set stop points along the one way, English-speaking driver<span class="jp">エグゼクティブハイヤーサービス: お好みの車両、片道途中の停車地点の設定、英語を話すドライバー</span></li>
+        <li><b>Flat-Rate Direct:</b> set fare by pick-up area, cannot set stop points.<span class="jp">定額ダイレクト：乗車エリアごとに運賃を設定、経由地は設定できません。</span></li>
+      </ul>
+    </div>
+    <div class="card-side">
+      <span class="cta">Start Your Reservation →</span>
+    </div>
+  </a>
+
+  <div class="service-card no-link">
+    <div class="card-main">
+      <div class="kicker">Original Tours</div>
+      <h2>Limited, Exclusive Experiences</h2>
+      <span class="jp">限定オリジナルツアー</span>
+      <p class="desc">A collection of exclusive, limited-availability tours designed by MK Kyoto.<span class="jp">MK京都外商部が企画した、限定・期間限定の特別なツアーコレクション。まで、多彩なツアーをご用意しています。</span></p>
+      <ul>
+        <li><b>Browse:</b> the current lineup of original experiences below.<span class="jp">現在のオリジナル体験のラインナップはこちら↓</span></li>
+        <li><b>Book:</b> directly through our reservation web page.<span class="jp">※予約ウェブページから直接ご予約ください。</span></li>
+      </ul>
+    </div>
+    <div class="card-side">
+      <div class="cta-group">
+        <a class="cta-btn" href="original-tours-ja.html">ツアー詳細はこちら →</a>
+        <a class="cta-btn" href="original-tours.html">View Tours →</a>
+      </div>
+    </div>
+  </div>
+
+  <a class="service-card" href="distance-taxi.html">
+    <div class="card-main">
+      <div class="kicker">Distance-Based Taxi</div>
+      <h2>Call a Metered Taxi</h2>
+      <span class="jp">メータータクシー</span>
+      <p class="desc">Call an MK metered taxi straight from your phone using Uber or S.RIDE — no fixed fare, priced by the meter.<span class="jp">UberまたはS.RIDEアプリから、スマートフォンで直接MKのメーター制タクシーを呼ぶことができます。</span></p>
+      <ul>
+        <li><b>Scan:</b> a QR code to open Uber or S.RIDE<span class="jp">QRコードをスキャンしてUberまたはS.RIDEアプリをダウンロードください</span></li>
+        <li><b>Ride:</b> fare is calculated by the meter<span class="jp">乗車：料金はメーターにより自動計算されます</span></li>
+      </ul>
+    </div>
+    <div class="card-side">
+      <span class="cta">View Options →</span>
+    </div>
+  </a>
+
+</div>
+
+<footer class="site-footer">MK KYOTO — This is a design mock-up and is not yet connected to a live booking system.</footer>
+
+</body>
+</html>
