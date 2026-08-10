@@ -210,6 +210,60 @@
   .req{color:var(--lacquer); margin-left:4px; font-weight:700;}
   .note{font-size:12.5px; color:var(--text-mute); margin-top:6px;}
 
+  input:disabled, select:disabled, textarea:disabled{
+    background:#EFEBE0;
+    color:var(--text-mute);
+    cursor:not-allowed;
+  }
+
+  .choice-detail{
+    margin:8px 0 10px 4px;
+    padding:14px 16px;
+    border-left:2px solid var(--gold-soft);
+    background:#FBFAF6;
+  }
+  .choice-detail .field{margin-bottom:0;}
+
+  .map-card{margin-top:6px;}
+  .map-card .photo-frame{
+    position:relative;
+    width:100%;
+    max-width:340px;
+    aspect-ratio:4/3;
+    overflow:hidden;
+    border:1px solid var(--gold-soft);
+    background:#FBF8F0;
+  }
+  .map-card .photo-frame img{
+    position:absolute; top:0; left:0; width:100%; height:100%;
+    object-fit:cover; object-position:center; display:block;
+  }
+  .map-card .photo-frame .photo-placeholder{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column; gap:6px;
+    color:var(--text-mute); font-size:12.5px; text-align:center; padding:12px;
+  }
+  .map-card .photo-frame .photo-placeholder .icon{font-size:22px;}
+  .map-card figcaption{
+    font-size:12px; color:var(--text-mute); margin-top:6px;
+  }
+  .map-card figcaption strong{color:var(--ink);}
+  .map-card .map-card-btn{
+    display:inline-block;
+    margin-top:8px;
+    font-family:'Shippori Mincho',serif;
+    font-size:13px;
+    color:var(--lacquer);
+    border:1px solid var(--lacquer);
+    padding:8px 14px;
+    border-radius:999px;
+    text-decoration:none;
+    white-space:nowrap;
+    transition:background .2s, color .2s;
+  }
+  .map-card .map-card-btn:hover{background:var(--lacquer); color:#fff;}
+
   input[type=text], input[type=email], input[type=tel], input[type=number], select, textarea{
     width:100%;
     font:inherit;
@@ -496,29 +550,80 @@
           <div class="field">
             <label class="flabel">Pick-up Location<span class="req">*</span><span class="jp">出発地</span></label>
             <div class="choices vertical">
+
               <label class="choice"><input type="radio" name="f023" value="1" required><span>JR Kyoto Station — MK VIP Station</span></label>
+
               <label class="choice"><input type="radio" name="f023" value="2"><span>Kyoto Station Platform</span></label>
+              <div class="choice-detail" data-for="f023" data-value="2" style="display:none;">
+                <div class="field">
+                  <label class="flabel" for="place1_detail_2">Train / Car / Seat No.<span class="req">*</span><span class="jp">列車号・車両号・座席番号</span></label>
+                  <input type="text" id="place1_detail_2" name="place1_detail" placeholder="e.g. Nozomi 23, Car 5, Seat 12A" disabled>
+                  <div class="note">Please enter your train number, car number, and seat number if known.</div>
+                </div>
+              </div>
+
               <label class="choice"><input type="radio" name="f023" value="3"><span>Kansai International Airport</span></label>
+              <div class="choice-detail" data-for="f023" data-value="3" style="display:none;">
+                <div class="field">
+                  <label class="flabel" for="place1_detail_3">Flight Number<span class="req">*</span><span class="jp">フライト番号</span></label>
+                  <input type="text" id="place1_detail_3" name="place1_detail" placeholder="e.g. JL123" disabled>
+                  <div class="note">Please enter your flight number.</div>
+                </div>
+              </div>
+
               <label class="choice"><input type="radio" name="f023" value="4"><span>Itami Airport</span></label>
+              <div class="choice-detail" data-for="f023" data-value="4" style="display:none;">
+                <div class="field">
+                  <label class="flabel" for="place1_detail_4">Flight Number<span class="req">*</span><span class="jp">フライト番号</span></label>
+                  <input type="text" id="place1_detail_4" name="place1_detail" placeholder="e.g. NH456" disabled>
+                  <div class="note">Please enter your flight number.</div>
+                </div>
+              </div>
+
               <label class="choice"><input type="radio" name="f023" value="5"><span>Hotel</span></label>
+              <div class="choice-detail" data-for="f023" data-value="5" style="display:none;">
+                <div class="field">
+                  <label class="flabel" for="place1_detail_5">Hotel Name<span class="req">*</span><span class="jp">ホテル名</span></label>
+                  <input type="text" id="place1_detail_5" name="place1_detail" placeholder="e.g. The Ritz-Carlton Kyoto" disabled>
+                  <div class="note">Please enter the full hotel name.</div>
+                </div>
+              </div>
+
               <label class="choice"><input type="radio" name="f023" value="6"><span>Other</span></label>
+              <div class="choice-detail" data-for="f023" data-value="6" style="display:none;">
+                <div class="field">
+                  <label class="flabel" for="place1_detail_6">Location Details<span class="req">*</span><span class="jp">詳細</span></label>
+                  <input type="text" id="place1_detail_6" name="place1_detail" placeholder="Please describe your location" disabled>
+                  <div class="note">Please provide as much detail as possible.</div>
+                </div>
+              </div>
+
             </div>
             <div class="note">Pick-up at Kyoto Station platform requires a driver entrance fee of ¥1,500 (entrance + parking). <a href="https://www.mk-group.co.jp/mktravel/pdf/en_kyotostation-mkvip-map.pdf" target="_blank" rel="noopener">MK VIP station map ↗</a></div>
+
+            <div class="choice-detail" data-for="f023" data-value="1" style="display:none;">
+              <div class="map-card" id="pickupMapCard">
+                <figure style="margin:0;">
+                  <div class="photo-frame">
+                    <img id="pickupMapImg" src="" alt="MK VIP Station map" style="display:none;">
+                    <div class="photo-placeholder" id="pickupMapPlaceholder">
+                      <span class="icon">🗺️</span>
+                      <span>Station map photo<br>coming soon</span>
+                    </div>
+                  </div>
+                  <figcaption><strong>MK VIP Station</strong> · MK VIPステーション</figcaption>
+                </figure>
+                <a class="map-card-btn" href="https://www.mk-group.co.jp/mktravel/pdf/en_kyotostation-mkvip-map.pdf" target="_blank" rel="noopener">View Map PDF ↗</a>
+              </div>
+            </div>
           </div>
 
-          <div class="row cols-2">
-            <div class="field">
-              <label class="flabel" for="place1_detail">Pick-up Location Detail<span class="req">*</span><span class="jp">出発地の詳細</span></label>
-              <input type="text" id="place1_detail" name="place1_detail" placeholder="e.g. ○○ Hotel" required>
-              <div class="note">Train no./seat, flight no., hotel name, etc.</div>
-            </div>
-            <div class="field">
-              <label class="flabel">Pick-up Time<span class="req">*</span><span class="jp">出発時刻</span></label>
-              <div class="time-group">
-                <input type="number" id="pickupHour" name="f028:hour" placeholder="HH" min="0" max="23" required>
-                <span>:</span>
-                <input type="number" id="pickupMinute" name="f028:minute" placeholder="MM" min="0" max="59" required>
-              </div>
+          <div class="field">
+            <label class="flabel">Pick-up Time<span class="req">*</span><span class="jp">出発時刻</span></label>
+            <div class="time-group">
+              <input type="number" id="pickupHour" name="f028:hour" placeholder="HH" min="0" max="23" required>
+              <span>:</span>
+              <input type="number" id="pickupMinute" name="f028:minute" placeholder="MM" min="0" max="59" required>
             </div>
           </div>
 
@@ -682,30 +787,82 @@
           <div class="field">
             <label class="flabel">Drop-off Location<span class="req">*</span><span class="jp">到着地</span></label>
             <div class="choices vertical">
+
               <label class="choice"><input type="radio" name="f029" value="1" required><span>JR Kyoto Station — MK VIP Station</span></label>
+
               <label class="choice"><input type="radio" name="f029" value="2"><span>Kyoto Station Platform</span></label>
+              <div class="choice-detail" data-for="f029" data-value="2" style="display:none;">
+                <div class="field">
+                  <label class="flabel" for="dropoff_detail_2">Train / Car / Seat No.<span class="req">*</span><span class="jp">列車号・車両号・座席番号</span></label>
+                  <input type="text" id="dropoff_detail_2" name="dropoff_detail" placeholder="e.g. Nozomi 23, Car 5, Seat 12A" disabled>
+                  <div class="note">Please enter your train number, car number, and seat number if known.</div>
+                </div>
+              </div>
+
               <label class="choice"><input type="radio" name="f029" value="3"><span>Kansai International Airport</span></label>
+              <div class="choice-detail" data-for="f029" data-value="3" style="display:none;">
+                <div class="field">
+                  <label class="flabel" for="dropoff_detail_3">Flight Number<span class="req">*</span><span class="jp">フライト番号</span></label>
+                  <input type="text" id="dropoff_detail_3" name="dropoff_detail" placeholder="e.g. JL123" disabled>
+                  <div class="note">Please enter your flight number.</div>
+                </div>
+              </div>
+
               <label class="choice"><input type="radio" name="f029" value="4"><span>Itami Airport</span></label>
+              <div class="choice-detail" data-for="f029" data-value="4" style="display:none;">
+                <div class="field">
+                  <label class="flabel" for="dropoff_detail_4">Flight Number<span class="req">*</span><span class="jp">フライト番号</span></label>
+                  <input type="text" id="dropoff_detail_4" name="dropoff_detail" placeholder="e.g. NH456" disabled>
+                  <div class="note">Please enter your flight number.</div>
+                </div>
+              </div>
+
               <label class="choice"><input type="radio" name="f029" value="5"><span>Hotel</span></label>
+              <div class="choice-detail" data-for="f029" data-value="5" style="display:none;">
+                <div class="field">
+                  <label class="flabel" for="dropoff_detail_5">Hotel Name<span class="req">*</span><span class="jp">ホテル名</span></label>
+                  <input type="text" id="dropoff_detail_5" name="dropoff_detail" placeholder="e.g. The Ritz-Carlton Kyoto" disabled>
+                  <div class="note">Please enter the full hotel name.</div>
+                </div>
+              </div>
+
               <label class="choice"><input type="radio" name="f029" value="6"><span>Other</span></label>
+              <div class="choice-detail" data-for="f029" data-value="6" style="display:none;">
+                <div class="field">
+                  <label class="flabel" for="dropoff_detail_6">Location Details<span class="req">*</span><span class="jp">詳細</span></label>
+                  <input type="text" id="dropoff_detail_6" name="dropoff_detail" placeholder="Please describe your location" disabled>
+                  <div class="note">Please provide as much detail as possible.</div>
+                </div>
+              </div>
+
             </div>
             <div class="note">Drop-off at Kyoto Station platform requires a driver entrance fee.</div>
+
+            <div class="choice-detail" data-for="f029" data-value="1" style="display:none;">
+              <div class="map-card" id="dropoffMapCard">
+                <figure style="margin:0;">
+                  <div class="photo-frame">
+                    <img id="dropoffMapImg" src="" alt="MK VIP Station map" style="display:none;">
+                    <div class="photo-placeholder" id="dropoffMapPlaceholder">
+                      <span class="icon">🗺️</span>
+                      <span>Station map photo<br>coming soon</span>
+                    </div>
+                  </div>
+                  <figcaption><strong>MK VIP Station</strong> · MK VIPステーション</figcaption>
+                </figure>
+                <a class="map-card-btn" href="https://www.mk-group.co.jp/mktravel/pdf/en_kyotostation-mkvip-map.pdf" target="_blank" rel="noopener">View Map PDF ↗</a>
+              </div>
+            </div>
           </div>
 
-          <div class="row cols-2">
-            <div class="field">
-              <label class="flabel" for="dropoff_detail">Drop-off Location Detail<span class="req">*</span><span class="jp">到着地の詳細</span></label>
-              <input type="text" id="dropoff_detail" name="dropoff_detail" placeholder="e.g. ○○ Hotel" required>
+          <div class="field">
+            <label class="flabel">Drop-off Time<span class="req">*</span><span class="jp">到着時刻</span></label>
+            <div class="time-group">
+              <input type="number" id="dropoffHour" name="f034:hour" placeholder="HH" min="0" max="23" required>
+              <span>:</span>
+              <input type="number" id="dropoffMinute" name="f034:minute" placeholder="MM" min="0" max="59" required>
             </div>
-            <div class="field">
-              <label class="flabel">Drop-off Time<span class="req">*</span><span class="jp">到着時刻</span></label>
-              <div class="time-group">
-                <input type="number" id="dropoffHour" name="f034:hour" placeholder="HH" min="0" max="23" required>
-                <span>:</span>
-                <input type="number" id="dropoffMinute" name="f034:minute" placeholder="MM" min="0" max="59" required>
-              </div>
-              <div class="note">Automatically calculated from your pick-up time and sightseeing duration — you can adjust it if needed.<br>配車時間と貸切時間から自動計算されます（必要に応じて修正できます）。</div>
-            </div>
+            <div class="note">Automatically calculated from your pick-up time and sightseeing duration — you can adjust it if needed.<br>配車時間と貸切時間から自動計算されます（必要に応じて修正できます）。</div>
           </div>
 
         </div>
@@ -1065,6 +1222,7 @@
   function serializeForm(formEl){
     const data = {};
     formEl.querySelectorAll('input, select, textarea').forEach(el => {
+      if (el.disabled) return;
       const key = el.name || el.id;
       if (!key) return;
       if (el.type === 'radio' || el.type === 'checkbox'){
@@ -1147,6 +1305,48 @@
 
   wireYesNoGate('f016', ['f017', 'f018']); // Add Another Limousine -> Vehicle, Number of Limousines
   wireYesNoGate('f020', ['f021', 'f022']); // Do you have luggage? -> Large Items, Medium Items
+
+  /* ---------- Show a location-specific detail field directly under the selected choice ---------- */
+  // f023 / f029 values: 1=VIP Station 2=Platform 3=Kansai 4=Itami 5=Hotel 6=Other
+  function wireInlineChoiceDetails(radioName){
+    const radios = document.querySelectorAll(`input[name="${radioName}"]`);
+    const details = document.querySelectorAll(`.choice-detail[data-for="${radioName}"]`);
+    if (!radios.length || !details.length) return;
+
+    function apply(){
+      const selected = document.querySelector(`input[name="${radioName}"]:checked`);
+      const val = selected ? selected.value : null;
+
+      details.forEach(detail => {
+        const match = detail.dataset.value === val;
+        detail.style.display = match ? 'block' : 'none';
+        const field = detail.querySelector('input, textarea');
+        if (field){
+          field.disabled = !match;
+          field.required = match;
+          if (!match) field.value = '';
+        }
+      });
+    }
+
+    radios.forEach(r => r.addEventListener('change', apply));
+    apply();
+  }
+
+  wireInlineChoiceDetails('f023');
+  wireInlineChoiceDetails('f029');
+
+  /* ---------- Swap the map placeholder for a real photo once one is added ---------- */
+  function initMapCardPhoto(imgId, placeholderId){
+    const img = document.getElementById(imgId);
+    const placeholder = document.getElementById(placeholderId);
+    if (img && placeholder && img.getAttribute('src')){
+      img.style.display = 'block';
+      placeholder.style.display = 'none';
+    }
+  }
+  initMapCardPhoto('pickupMapImg', 'pickupMapPlaceholder');
+  initMapCardPhoto('dropoffMapImg', 'dropoffMapPlaceholder');
 
   /* ---------- Disable child's age field unless the child seat checkbox is checked ---------- */
   const childSeatCheckbox = document.querySelector('input[name="child_seat"]');
