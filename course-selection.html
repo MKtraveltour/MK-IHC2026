@@ -33,8 +33,23 @@
   header.site{
     display:flex;
     align-items:center;
-    justify-content:space-between;
+    justify-content:center;
     padding:22px 40px;
+    position:relative;
+  }
+  .back-btn{
+    position:absolute; left:20px; top:50%; transform:translateY(-50%);
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:'Poppins',sans-serif; font-size:13px; font-weight:600;
+    color:var(--ink); text-decoration:none; white-space:nowrap;
+    padding:8px 14px; border:1px solid #ddd; border-radius:999px;
+    background:#fff; transition:background .2s, border-color .2s;
+  }
+  .back-btn:hover{background:#F7F5F0; border-color:var(--gold-line);}
+  .back-btn svg{width:14px; height:14px; flex:none;}
+  @media (max-width:640px){
+    .back-btn span{display:none;}
+    .back-btn{padding:8px 10px;}
   }
   .brand{display:flex; align-items:center; gap:12px;}
   .brand .logo{
@@ -204,6 +219,10 @@
 <body>
 
 <header class="site">
+  <a class="back-btn" href="javascript:void(0)" onclick="if(window.history.length>1){history.back();}else{location.href='index.html';}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    <span>Back</span>
+  </a>
   <div class="brand">
     <div class="logo"><div class="top"><span>MK</span></div></div>
     <div class="wordmark">MK KYOTO</div>
