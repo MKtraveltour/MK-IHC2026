@@ -521,6 +521,7 @@
               <label class="choice"><input type="radio" name="f03" value="2"><span>Sightseeing</span></label>
               <label class="choice"><input type="radio" name="f03" value="3"><span>Transfer + Sightseeing</span></label>
             </div>
+            <div class="note">空港への送迎を含む観光用ハイヤーサービスをご希望の場合は、「Transfer + Sightseeing」オプションをお選びください。<br>Please select the "Transfer + Sightseeing" option if you would like a sightseeing hire service that includes airport pick-up or drop-off.</div>
           </div>
 
           <div class="row cols-2">
@@ -787,6 +788,7 @@
           </div>
 
           <div class="divider-label">Estimated Fare 概算料金</div>
+          <div class="note">If you wish to have the vehicle delivered outside of Kyoto City, a vehicle transport fee will be added to the quoted vehicle price.<br>京都市外への配車をご希望の場合、概算料金に別途、車両回送費が加算されます。</div>
           <div class="field" id="sightseeingDurationField" style="display:none;">
             <label class="flabel" for="durationSelect">Sightseeing Duration<span class="jp">貸切時間</span></label>
             <select id="durationSelect">
@@ -1190,6 +1192,14 @@
     return null; // Hotel / Other — outside the flat-rate table, needs a manual quote
   }
 
+  function vehicleFare(vehicleId, isSightseeingMode, hoursVal, pickupVal, dropoffVal){
+    if (!FARE_TABLE[vehicleId]) return null;
+    if (isSightseeingMode){
+      return hourlyFare(vehicleId, hoursVal);
+    }
+    return transferFare(vehicleId, pickupVal) ?? transferFare(vehicleId, dropoffVal);
+  }
+
   function updateFareCard(){
     const card = document.getElementById('fareCard');
     const vehicleId = document.getElementById('f014').value;
@@ -1207,44 +1217,66 @@
       return;
     }
 
-    let base = null;
-    let baseLabel = '';
-    if (isSightseeing){
-      const hoursVal = document.getElementById('durationSelect').value;
-      base = hourlyFare(vehicleId, hoursVal);
-      baseLabel = 'Sightseeing (' + hoursVal + ' hours)';
-    } else {
-      const pickupVal = document.querySelector('input[name="f023"]:checked')?.value;
-      const dropoffVal = document.querySelector('input[name="f029"]:checked')?.value;
-      base = transferFare(vehicleId, pickupVal) ?? transferFare(vehicleId, dropoffVal);
-      baseLabel = 'One-way Transfer';
-    }
+    const hoursVal = isSightseeing ? document.getElementById('durationSelect').value : null;
+    const pickupVal = document.querySelector('input[name="f023"]:checked')?.value;
+    const dropoffVal = document.querySelector('input[name="f029"]:checked')?.value;
+    const baseLabel = isSightseeing ? ('Sightseeing (' + hoursVal + ' hours)') : 'One-way Transfer';
 
-    if (base === null){
+    const primaryQty = parseInt(document.getElementById('f015').value || '1', 10) || 1;
+    const primaryUnitFare = vehicleFare(vehicleId, isSightseeing, hoursVal, pickupVal, dropoffVal);
+
+    if (primaryUnitFare === null){
       card.innerHTML = '<div class="fare-note">This route isn\'t on the flat-rate table (Hotel / Other pick-up or drop-off). MK will confirm the exact fare with your reservation.</div>';
       return;
+    }
+
+    const primaryTotal = primaryUnitFare * primaryQty;
+
+    // Second vehicle (Add Another Limousine)
+    const wantsAdditional = document.querySelector('input[name="f016"]:checked')?.value === '1';
+    let additionalTotal = 0;
+    let additionalUnitFare = null;
+    let additionalQty = 0;
+    let additionalUnavailable = false;
+    if (wantsAdditional){
+      const additionalVehicleId = document.getElementById('f017').value;
+      additionalQty = parseInt(document.getElementById('f018').value || '1', 10) || 1;
+      if (additionalVehicleId){
+        additionalUnitFare = vehicleFare(additionalVehicleId, isSightseeing, hoursVal, pickupVal, dropoffVal);
+        if (additionalUnitFare !== null){
+          additionalTotal = additionalUnitFare * additionalQty;
+        } else {
+          additionalUnavailable = true;
+        }
+      }
     }
 
     const englishChecked = document.getElementById('englishDriver').checked;
     let englishFee = 0;
     if (englishChecked){
-      const hoursForFee = isSightseeing ? parseFloat(document.getElementById('durationSelect').value) : 1; // 1hr minimum estimate for transfers
+      const hoursForFee = isSightseeing ? parseFloat(hoursVal) : 1; // 1hr minimum estimate for transfers
       englishFee = Math.ceil(hoursForFee / 0.5) * ENGLISH_DRIVER_FEE_PER_30MIN;
     }
-    const total = base + englishFee;
+
+    const total = primaryTotal + additionalTotal + englishFee;
 
     card.innerHTML =
-      '<div class="row-line"><span>' + baseLabel + '</span><span>' + yen(base) + '</span></div>' +
+      '<div class="row-line"><span>' + baseLabel + (primaryQty > 1 ? ' \u00d7 ' + primaryQty : '') + '</span><span>' + yen(primaryTotal) + '</span></div>' +
+      (wantsAdditional && additionalUnitFare !== null
+        ? '<div class="row-line"><span>2nd Vehicle' + (additionalQty > 1 ? ' \u00d7 ' + additionalQty : '') + '</span><span>+' + yen(additionalTotal) + '</span></div>'
+        : '') +
       (englishChecked ? '<div class="row-line"><span>English-speaking driver</span><span>+' + yen(englishFee) + '</span></div>' : '') +
       '<div class="row-line total"><span>Estimated Total 概算合計</span><span>' + yen(total) + '</span></div>' +
       '<div class="fare-note">Excludes admission, parking, tolls, and meals. Tax included. Final fare is confirmed by MK.' +
       (!isSightseeing && englishChecked ? ' English-driver fee shown assumes a 1-hour trip; MK will adjust based on actual drive time.' : '') +
+      (additionalUnavailable ? ' The 2nd vehicle\'s fare is not on the flat-rate table and is not included above; MK will confirm it separately.' : '') +
       '</div>';
   }
 
-  ['f014','durationSelect','englishDriver'].forEach(id => {
+  ['f014','f015','f016','f017','f018','durationSelect','englishDriver'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('change', updateFareCard);
+    if (el) el.addEventListener('input', updateFareCard);
   });
   document.querySelectorAll('input[name="f03"], input[name="f023"], input[name="f029"]').forEach(el => {
     el.addEventListener('change', updateFareCard);
