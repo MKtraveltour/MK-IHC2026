@@ -1018,6 +1018,19 @@
       form.reportValidity();
       return;
     }
+    // The selected airport lives in the `state` JS object, not a form
+    // field — inject a hidden input so it's captured by serializeForm()
+    // and reaches the sheet/emails.
+    let airportHidden = document.getElementById('airportHiddenField');
+    if (!airportHidden){
+      airportHidden = document.createElement('input');
+      airportHidden.type = 'hidden';
+      airportHidden.id = 'airportHiddenField';
+      airportHidden.name = 'airport';
+      form.appendChild(airportHidden);
+    }
+    airportHidden.value = state.airport === 'kansai' ? "Kansai Int'l Airport (KIX)" : 'Osaka Itami Airport (ITM)';
+
     sendReservationEmail(form, 'Direct Flat-Rate Airport Transfer');
     submitToAppsScript(form, 'Direct Flat-Rate Airport Transfer');
     document.querySelectorAll('.stage').forEach(s => s.style.display = 'none');
