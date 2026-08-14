@@ -90,6 +90,45 @@
   .req{color:var(--lacquer); margin-left:4px; font-weight:700;}
   .note{font-size:12.5px; color:var(--text-body); margin-top:6px; line-height:1.6;}
 
+  input:disabled, select:disabled, textarea:disabled{
+    background:#EFEBE0;
+    color:var(--text-body);
+    cursor:not-allowed;
+  }
+
+  .map-card{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    background:#FBF8F0;
+    border:1px solid var(--gold-soft);
+    border-radius:var(--radius);
+    padding:16px 18px;
+  }
+  .map-card .map-card-icon{
+    flex:none;
+    width:40px; height:40px;
+    border-radius:50%;
+    background:#FFFFFF;
+    border:1px solid var(--gold-soft);
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px;
+  }
+  .map-card .map-card-text{flex:1; font-size:13px; color:var(--text-body);}
+  .map-card .map-card-text strong{display:block; color:var(--ink); font-size:14px; margin-bottom:2px;}
+  .map-card .map-card-btn{
+    flex:none;
+    font-size:13px;
+    color:var(--lacquer);
+    border:1px solid var(--lacquer);
+    padding:8px 14px;
+    border-radius:999px;
+    text-decoration:none;
+    white-space:nowrap;
+    transition:background .2s, color .2s;
+  }
+  .map-card .map-card-btn:hover{background:var(--lacquer); color:#fff;}
+
   input[type=text], input[type=email], input[type=tel], input[type=number], select, textarea{
     width:100%; font:inherit; padding:11px 13px; border:1px solid #CFC8B4; border-radius:var(--radius); background:#FEFDFB; color:var(--ink);
   }
@@ -290,9 +329,30 @@
               <input type="text" id="travelDate" placeholder="Month/Day/Year" required>
             </div>
             <div class="field">
-              <label class="flabel" for="locationDetail">Pick-up / Drop-off Location Detail<span class="req">*</span><span class="jp">出発地・到着地の詳細</span></label>
+              <label class="flabel">Kyoto-side Location<span class="req">*</span><span class="jp">京都側の出発地・到着地</span></label>
+              <div class="choices vertical">
+                <label class="choice"><input type="radio" name="kyotoLocation" value="1" required><span>JR Kyoto Station — MK VIP Station</span></label>
+                <label class="choice"><input type="radio" name="kyotoLocation" value="2"><span>Kyoto Station Platform</span></label>
+                <label class="choice"><input type="radio" name="kyotoLocation" value="5"><span>Hotel</span></label>
+                <label class="choice"><input type="radio" name="kyotoLocation" value="6"><span>Other</span></label>
+              </div>
+              <div class="note">This is the Kyoto-side address for your transfer — where we pick you up (Kyoto → Airport) or drop you off (Airport → Kyoto).</div>
+            </div>
+          </div>
+
+          <div class="row cols-2">
+            <div class="field">
+              <label class="flabel" id="locationDetailLabel" for="locationDetail">Location Detail<span class="req">*</span><span class="jp" id="locationDetailLabelJp">詳細</span></label>
               <input type="text" id="locationDetail" placeholder="e.g. JR Kyoto Station / ○○ Hotel" required>
-              <div class="note">The Kyoto-side address for your transfer — where we pick you up (Kyoto → Airport) or drop you off (Airport → Kyoto).</div>
+              <div class="note" id="locationDetailNote">Please select a Kyoto-side location above.</div>
+              <div class="map-card" id="locationMapCard" style="display:none;">
+                <div class="map-card-icon">🗺️</div>
+                <div class="map-card-text">
+                  <strong>MK VIP Station</strong>
+                  <span>Please check the station map for the exact meeting point.</span>
+                </div>
+                <a class="map-card-btn" href="https://www.mk-group.co.jp/mktravel/pdf/en_kyotostation-mkvip-map.pdf" target="_blank" rel="noopener">View Map ↗</a>
+              </div>
             </div>
           </div>
 
@@ -632,6 +692,89 @@
     radio.addEventListener('change', () => { direction = radio.value; applyDirection(); });
   });
 
+  /* ---------- Show a location-specific detail field for the Kyoto-side location ---------- */
+  // kyotoLocation values: 1=VIP Station 2=Platform 5=Hotel 6=Other
+  (function wireKyotoLocationDetail(){
+    const LOCATION_DETAIL_CONFIG = {
+      '2': {
+        label: 'Train / Car / Seat No.',
+        jp: '列車号・車両号・座席番号',
+        placeholder: 'e.g. Nozomi 23, Car 5, Seat 12A',
+        note: 'Please enter your train number, car number, and seat number if known.'
+      },
+      '5': {
+        label: 'Hotel Name',
+        jp: 'ホテル名',
+        placeholder: 'e.g. The Ritz-Carlton Kyoto',
+        note: 'Please enter the full hotel name.'
+      },
+      '6': {
+        label: 'Location Details',
+        jp: '詳細',
+        placeholder: 'Please describe your location',
+        note: 'Please provide as much detail as possible.'
+      }
+    };
+
+    const radios = document.querySelectorAll('input[name="kyotoLocation"]');
+    const input = document.getElementById('locationDetail');
+    const labelEl = document.getElementById('locationDetailLabel');
+    const labelJpEl = document.getElementById('locationDetailLabelJp');
+    const noteEl = document.getElementById('locationDetailNote');
+    const mapCard = document.getElementById('locationMapCard');
+    if (!radios.length || !input || !labelEl || !noteEl || !mapCard) return;
+
+    function setLabelText(text){
+      if (labelEl.firstChild && labelEl.firstChild.nodeType === Node.TEXT_NODE){
+        labelEl.firstChild.textContent = text;
+      } else {
+        labelEl.insertBefore(document.createTextNode(text), labelEl.firstChild);
+      }
+    }
+
+    function apply(){
+      const selected = document.querySelector('input[name="kyotoLocation"]:checked');
+      const val = selected ? selected.value : null;
+
+      if (val === '1'){
+        // VIP Station: show the map, hide the text field entirely
+        input.style.display = 'none';
+        input.disabled = true;
+        input.required = false;
+        input.value = '';
+        noteEl.style.display = 'none';
+        mapCard.style.display = 'flex';
+        return;
+      }
+
+      mapCard.style.display = 'none';
+      input.style.display = 'block';
+
+      if (!val){
+        input.disabled = true;
+        input.required = false;
+        noteEl.style.display = 'block';
+        noteEl.textContent = 'Please select a Kyoto-side location above.';
+        return;
+      }
+
+      input.disabled = false;
+      input.required = true;
+
+      const cfg = LOCATION_DETAIL_CONFIG[val];
+      if (cfg){
+        setLabelText(cfg.label);
+        if (labelJpEl) labelJpEl.textContent = cfg.jp;
+        input.placeholder = cfg.placeholder;
+        noteEl.style.display = 'block';
+        noteEl.textContent = cfg.note;
+      }
+    }
+
+    radios.forEach(r => r.addEventListener('change', apply));
+    apply();
+  })();
+
   function wireAirportGroup(groupId){
     document.getElementById(groupId).addEventListener('click', e => {
       const card = e.target.closest('.airport-card');
@@ -870,6 +1013,19 @@
       form.reportValidity();
       return;
     }
+    // The selected vehicle lives in a JS variable, not a form field — inject
+    // a hidden input so it's captured by serializeForm() and reaches the
+    // sheet/emails.
+    let vehicleHidden = document.getElementById('vehicleHiddenField');
+    if (!vehicleHidden){
+      vehicleHidden = document.createElement('input');
+      vehicleHidden.type = 'hidden';
+      vehicleHidden.id = 'vehicleHiddenField';
+      vehicleHidden.name = 'vehicle';
+      form.appendChild(vehicleHidden);
+    }
+    vehicleHidden.value = (PREMIUM_FLEET[selectedVehicleId] && PREMIUM_FLEET[selectedVehicleId].name) || selectedVehicleId;
+
     sendReservationEmail(form, 'Executive Hire Airport Transfer');
     submitToAppsScript(form, 'Executive Hire Airport Transfer');
     form.style.display = 'none';
