@@ -1,226 +1,137 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MK KYOTO | Reservations</title>
+<title>MK KYOTO | Reservations Closed</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --gold:#8B6F47; --gold-dark:#8B6F47; --gold-line:#8B6F47; --gold-soft:#C9B79A;
-    --cream:#F8F6F1; --text-body:#4B5563; --text-heading:#8B6F47; --lacquer:#5C8D4A;
-    --white:#FFFFFF; --ink:#2B2B2B; --btn:#7A1F2B;
+    --gold:#8B6F47; --gold-line:#8B6F47; --gold-soft:#C9B79A;
+    --cream:#F8F6F1; --text-body:#4B5563; --ink:#2B2B2B;
   }
   *{box-sizing:border-box;}
-  body{margin:0; background:var(--white); color:var(--ink); font-family:'EB Garamond', serif; line-height:1.6;}
-  .ui{font-family:'Poppins', sans-serif;}
-
-  header.site{display:flex; align-items:center; justify-content:center; padding:26px 40px;}
-  .brand{display:flex; align-items:center; gap:12px;}
-  .brand .logo{width:44px; height:44px; border-radius:10px; overflow:hidden; display:flex; flex-direction:column; border:1px solid #ddd;}
-  .brand .logo .top{flex:1; background:linear-gradient(135deg,#F4C15D,#F0A9C7); display:flex; align-items:center; justify-content:center;}
-  .brand .logo span{font-family:'Poppins',sans-serif; font-weight:700; font-size:12px; color:#111;}
-  .brand .wordmark{font-family:'Poppins',sans-serif; font-weight:700; font-size:17px; letter-spacing:.02em; color:#151515;}
-
-  .hero{text-align:center; padding:20px 24px 10px;}
-  .hero h1{font-size:clamp(38px,5.5vw,58px); font-weight:400; color:var(--text-heading); margin:6px 0 14px;}
-  .hero .sub{font-size:18px; color:var(--gold-dark); margin:0 0 20px;}
-  .hero p{max-width:600px; margin:0 auto; color:var(--text-body); font-size:16px; line-height:1.75;}
-
-  .choices-wrap{max-width:1160px; margin:50px auto 100px; padding:0 24px; display:grid; grid-template-columns:1fr; gap:22px;}
-
-  .service-card{
-    position:relative; overflow:hidden; isolation:isolate; background:rgba(255,255,255,.55);
-    border:1px solid var(--gold-line); padding:32px 36px; display:flex; flex-direction:row; align-items:center; gap:32px; text-decoration:none; color:var(--ink);
-    transition:border-color .2s, box-shadow .2s;
-  }
-  .service-card:hover{border-color:var(--lacquer); box-shadow:0 12px 28px rgba(0,0,0,.06);}
-
-  /* --- Background photo layer ---
-     .bg-photo sits behind everything. Right now it shows a placeholder gradient
-     via --card-bg. When real photos are ready, just set:
-       style="--card-bg:url('xxx.jpg')"
-     on the .bg-photo div (keep the same class/markup, only the url changes). */
-  .service-card .bg-photo{
-    position:absolute; inset:0; z-index:0;
-    background-image:var(--card-bg); background-size:cover; background-position:center;
-    opacity:.85;
-  }
-  .service-card .bg-photo::after{
-    content:""; position:absolute; inset:0;
-    background:linear-gradient(90deg, rgba(255,255,255,.94) 0%, rgba(255,255,255,.8) 55%, rgba(255,255,255,.35) 100%);
-  }
-
-  .service-card .card-main{position:relative; z-index:1; flex:2; min-width:0;}
-  .service-card .card-side{position:relative; z-index:1; flex:0 0 220px; display:flex; flex-direction:column; align-items:stretch; gap:10px;}
-  .service-card .kicker{font-family:'Poppins',sans-serif; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--gold-dark); margin-bottom:14px;}
-  .service-card h2{font-size:26px; font-weight:500; margin:0 0 6px;}
-  .service-card .jp{font-size:14px; color:var(--text-body); margin-bottom:18px; display:block;}
-  .service-card p.desc .jp{font-size:13.5px; color:var(--text-body); display:block; margin-top:4px; opacity:.85;}
-  .service-card ul li .jp{font-size:13px; color:var(--text-body); display:block; margin-top:2px; opacity:.85;}
-  .service-card p.desc{font-size:15px; color:var(--text-body); line-height:1.8; margin:0 0 18px;}
-  .service-card ul{margin:0; padding-left:18px; font-size:14px; color:var(--text-body); line-height:2;}
-  .service-card ul li b{color:var(--ink);}
-  .service-card .cta{
-    font-family:'Poppins',sans-serif; font-size:12.5px; font-weight:600; letter-spacing:.03em;
-    color:#fff; background:var(--btn); border-radius:999px; padding:14px 0; text-align:center; transition:background .2s;
-  }
-  .service-card:hover .cta{background:var(--lacquer);}
-  .service-card.no-link:hover{border-color:var(--gold-line); box-shadow:none;}
-  .cta-group{display:flex; flex-direction:column; gap:10px;}
-  .cta-btn{
-    font-family:'Poppins',sans-serif; font-size:12.5px; font-weight:600; letter-spacing:.03em; text-decoration:none;
-    color:#fff; background:var(--btn); border-radius:999px; padding:14px 0; text-align:center; transition:background .2s;
-  }
-  .cta-btn:hover{background:var(--lacquer);}
-
-  @media (max-width:760px){
-    .service-card{flex-direction:column; align-items:stretch; gap:0;}
-    .service-card .card-side{flex:none;}
-    .service-card .bg-photo::after{background:linear-gradient(180deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.85) 45%);}
-  }
-
-  footer.site-footer{text-align:center; font-size:12px; color:var(--text-body); padding:0 20px 50px;}
-
-  .contact-info{
-    max-width:640px;
-    margin:0 auto 32px;
-    padding:24px 28px;
-    border:1px solid var(--gold-line);
+  body{
+    margin:0;
+    min-height:100vh;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'EB Garamond', serif;
+    line-height:1.7;
     display:flex;
-    justify-content:center;
     align-items:center;
-    gap:22px;
-    text-align:left;
-    font-size:13.5px;
-    color:var(--text-body);
-    line-height:1.9;
+    justify-content:center;
+    padding:40px 20px;
   }
-  .contact-info .contact-logo{
-    flex:none;
-    width:56px;
-    height:56px;
-    border-radius:10px;
+  .card{
+    max-width:580px;
+    width:100%;
+    background:#fff;
+    border:1px solid var(--gold-line);
+    padding:48px 40px;
+    text-align:center;
+  }
+  .logo{
+    width:64px; height:64px;
+    margin:0 auto 20px;
+    border-radius:12px;
     overflow:hidden;
     border:1px solid #ddd;
   }
-  .contact-info .contact-logo img{width:100%; height:100%; object-fit:contain; display:block;}
-  .contact-info .contact-text{flex:none;}
-  .contact-info .label{
+  .logo img{width:100%; height:100%; object-fit:contain; display:block;}
+  .wordmark{
     font-family:'Poppins',sans-serif;
-    font-weight:600;
+    font-weight:700;
+    font-size:15px;
+    letter-spacing:.08em;
+    color:var(--gold);
+    margin-bottom:28px;
+  }
+  h1{
+    font-size:23px;
+    font-weight:500;
+    margin:0 0 10px;
     color:var(--ink);
-    margin-right:6px;
   }
-  .contact-info a{color:var(--lacquer); text-decoration:none; border-bottom:1px dotted var(--lacquer);}
-  .contact-info a:hover{color:var(--ink); border-color:var(--ink);}
-  @media (max-width:480px){
-    .contact-info{flex-direction:column; text-align:center;}
+  .sub{
+    font-family:'Poppins',sans-serif;
+    font-size:13px;
+    letter-spacing:.02em;
+    color:var(--text-body);
+    margin-bottom:28px;
   }
+  p{
+    font-size:15.5px;
+    color:var(--text-body);
+    margin:0 0 14px;
+  }
+  .more-info{
+    margin-top:28px;
+    padding-top:24px;
+    border-top:1px dashed var(--gold-soft);
+    text-align:left;
+  }
+  .more-info p{text-align:center;}
+  .more-info .links{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    max-width:360px;
+    margin:16px auto 0;
+  }
+  .more-info .links a{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-family:'Poppins',sans-serif;
+    font-size:13px;
+    color:var(--ink);
+    text-decoration:none;
+    border:1px solid var(--gold-soft);
+    padding:12px 16px;
+    transition:border-color .2s, background .2s;
+  }
+  .more-info .links a:hover{border-color:var(--gold); background:var(--cream);}
+  .more-info .links a .arrow{color:var(--gold);}
+  .contact{
+    margin-top:28px;
+    padding-top:24px;
+    border-top:1px dashed var(--gold-soft);
+    font-size:13.5px;
+    color:var(--text-body);
+  }
+  .contact .label{font-family:'Poppins',sans-serif; font-weight:600; color:var(--ink); margin-right:6px;}
 </style>
 </head>
 <body>
 
-<header class="site">
-  <div class="brand">
-    <div class="logo"><img src="data:image/gif;base64,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" alt="MK KYOTO" style="width:100%; height:100%; object-fit:contain; display:block;"></div>
-    <div class="wordmark">MK KYOTO</div>
-  </div>
-</header>
+<div class="card">
+  <div class="logo"><img src="data:image/gif;base64,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" alt="MK KYOTO"></div>
+  <div class="wordmark">MK KYOTO</div>
 
-<section class="hero">
-  <h1>Reservations</h1>
-  <div class="sub">ご予約</div>
-  <p>Choose the service you'd like to book. Each option will guide you through the steps needed to complete your reservation.</p>
-</section>
+  <h1>第32回国際園芸学会議限定プランでの<br>ご予約受付を終了いたしました。</h1>
+  <div class="sub">We have closed reservations for the special plan dedicated to The 32nd International Horticultural Congress.</div>
 
-<div class="choices-wrap">
+  <p>この度は、MK KYOTOのハイヤー・観光サービスにご関心をお寄せいただき、誠にありがとうございました。<br>
+  Thank you very much for your interest in MK KYOTO's hire and sightseeing services.</p>
 
-  <div class="service-card no-link">
-    <div class="bg-photo" style="--card-bg:url('images/original-tours.jpg');"></div>
-    <div class="card-main">
-      <div class="kicker">Original Tours</div>
-      <h2>Limited, Exclusive Experiences</h2>
-      <span class="jp">限定オリジナルツアー</span>
-      <p class="desc">A collection of exclusive, limited-availability tours designed by MK Kyoto.<span class="jp">MK京都外商部が企画した、限定・期間限定の特別なツアーコレクション。まで、多彩なツアーをご用意しています。</span></p>
-      <ul>
-        <li><b>Browse:</b> the current lineup of original experiences below.<span class="jp">現在のオリジナル体験のラインナップはこちら↓</span></li>
-        <li><b>Book:</b> directly through our reservation web page.<span class="jp">※予約ウェブページから直接ご予約ください。</span></li>
-      </ul>
-    </div>
-    <div class="card-side">
-      <div class="cta-group">
-        <a class="cta-btn" href="original-tours-ja.html">ツアー詳細はこちら →</a>
-        <a class="cta-btn" href="original-tours-en.html">View Tours →</a>
-      </div>
+  <div class="more-info">
+    <p>弊社サービスは年中無休で対応しております。<br>
+    ご利用を検討いただける場合は以下ホームページよりサービス内容をご確認下さい。<br>
+    Our services are available year-round.<br>
+    If you are considering using our services, please review the details on the website below.</p>
+    <div class="links">
+      <a href="https://www.mk-group.co.jp/kyoto/hire/" target="_blank" rel="noopener"><span>日本語版ホームページはこちら</span><span class="arrow">↗</span></a>
+      <a href="https://mktaxi-japan.com/kyoto/" target="_blank" rel="noopener"><span>英語版ホームページはこちら</span><span class="arrow">↗</span></a>
     </div>
   </div>
 
-  <a class="service-card" href="airport-transfer.html">
-    <div class="bg-photo" style="--card-bg:url('images/airport-transfer.jpg');"></div>
-    <div class="card-main">
-      <div class="kicker">Airport Transfer</div>
-      <h2>Kyoto ⇄ Kansai / Itami Airport</h2>
-      <span class="jp">空港送迎（ハイヤー・定額直行）</span>
-      <p class="desc">Choose between an Executive Hire with a your preferred vehicle and English-speaking driver, or a straightforward flat-rate direct transfer.<span class="jp">お好みの車種を選択し、英語を話すドライバーを手配できるエグゼクティブハイヤーサービス、または簡単な定額料金の直接送迎サービスのいずれかを選択してください。</span></p>
-      <ul>
-        <li><b>Executive Hire service:</b> your preferred vehicle, set stop points along the one way, English-speaking driver<span class="jp">エグゼクティブハイヤーサービス: お好みの車両、片道途中の停車地点の設定、英語を話すドライバー</span></li>
-        <li><b>Flat-Rate Direct:</b> set fare by pick-up area, cannot set stop points.<span class="jp">定額ダイレクト：乗車エリアごとに運賃を設定、経由地は設定できません。</span></li>
-      </ul>
-    </div>
-    <div class="card-side">
-      <span class="cta">Start Your Reservation →</span>
-    </div>
-  </a>
-
-  <a class="service-card" href="course-selection.html">
-    <div class="bg-photo" style="--card-bg:url('images/sightseeing-kyoto.jpg');"></div>
-    <div class="card-main">
-      <div class="kicker">Sightseeing Hire Service</div>
-      <h2>Sightseeing &amp; Custom Itineraries</h2>
-      <span class="jp">観光ハイヤー・貸切観光サービス</span>
-      <p class="desc">Charter a private vehicle by the hour to go around Kyoto's most popular sights, or build a fully custom itinerary.<span class="jp">専用車を時間単位でチャーターして、京都の最も人気のある観光スポットを巡ったり、完全にカスタマイズした旅程を組み立てたりできます。</span></p>
-      <ul>
-        <li><b>Choose:</b> a popular route, or a completely custom plan<span class="jp">人気のルート、または完全にカスタマイズされたプランをお選びください。</span></li>
-        <li><b>Then:</b> select your vehicle and enter your preferred reservation details.<span class="jp">次に、車両を選択し、希望の予約詳細を入力します。</span></li>
-      </ul>
-    </div>
-    <div class="card-side">
-      <span class="cta">Start Your Reservation →</span>
-    </div>
-  </a>
-
-  <a class="service-card" href="distance-taxi.html">
-    <div class="bg-photo" style="--card-bg:url('images/distance-taxi.jpg');"></div>
-    <div class="card-main">
-      <div class="kicker">Distance-Based Taxi</div>
-      <h2>Call a Metered Taxi</h2>
-      <span class="jp">メータータクシー</span>
-      <p class="desc">Call an MK metered taxi straight from your phone using Uber or S.RIDE — no fixed fare, priced by the meter.<span class="jp">UberまたはS.RIDEアプリから、スマートフォンで直接MKのメーター制タクシーを呼ぶことができます。</span></p>
-      <ul>
-        <li><b>Scan:</b> a QR code to open Uber or S.RIDE<span class="jp">QRコードをスキャンしてUberまたはS.RIDEアプリをダウンロードください</span></li>
-        <li><b>Ride:</b> fare is calculated by the meter<span class="jp">乗車：料金はメーターにより自動計算されます</span></li>
-      </ul>
-    </div>
-    <div class="card-side">
-      <span class="cta">View Options →</span>
-    </div>
-  </a>
-
-</div>
-
-<div class="contact-info">
-  <div class="contact-logo"><img src="data:image/gif;base64,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" alt="MK KYOTO"></div>
-  <div class="contact-text">
-    <div><span class="label">住所</span>〒601-8432 京都市南区西九条東島町63-1</div>
-    <div><a href="https://www.google.co.jp/maps/place/%E3%82%A8%E3%83%A0%E3%82%B1%E3%82%A4+%E6%9C%AC%E7%A4%BE/@34.979178,135.753967,18z/data=!3m1!4b1!4m6!3m5!1s0x600108aae7b988cb:0x4a5582f5d54bf199!8m2!3d34.979178!4d135.753967!16s%2Fg%2F11b7swd82g?hl=ja&amp;entry=ttu&amp;g_ep=EgoyMDI2MDgxNy4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener">地図で見る ↗</a></div>
+  <div class="contact">
     <div><span class="label">お問合せ先</span>080-7475-5850（9：00～17：00）</div>
   </div>
 </div>
-
-<footer class="site-footer">MK KYOTO — This is a design mock-up and is not yet connected to a live booking system.</footer>
 
 </body>
 </html>
